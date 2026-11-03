@@ -8,8 +8,18 @@ defined( 'ABSPATH' ) || exit;
 
 class Marsad_Connector_Json extends Marsad_Connector {
 
+	/** @var string */
+	private $id;
+
+	/**
+	 * @param string $id one instance per source the user added
+	 */
+	public function __construct( $id = 'json' ) {
+		$this->id = $id;
+	}
+
 	public function id() {
-		return 'json';
+		return $this->id;
 	}
 
 	public function label() {

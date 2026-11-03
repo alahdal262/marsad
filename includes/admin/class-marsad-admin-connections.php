@@ -7,6 +7,9 @@ defined( 'ABSPATH' ) || exit;
 
 class Marsad_Admin_Connections {
 
+	/** Connector id the "Add a source" form posts; the handler turns it into a new source. */
+	const NEW_ID = 'new';
+
 	public static function render() {
 		if ( ! current_user_can( Marsad_Plugin::CAP_MANAGE ) ) {
 			wp_die( esc_html__( 'You are not allowed to manage connections.', 'marsad' ), 403 );
@@ -34,16 +37,42 @@ class Marsad_Admin_Connections {
 		Marsad_Admin::print_notice();
 
 		foreach ( $groups as $g => $title ) {
-			if ( empty( $by_group[ $g ] ) ) {
+			if ( empty( $by_group[ $g ] ) && 'custom' !== $g ) {
 				continue;
 			}
-			echo '<h2 class="marsad-group">' . esc_html( $title ) . '</h2><div class="marsad-conns">';
-			foreach ( $by_group[ $g ] as $c ) {
+			echo '<h2 class="marsad-group">' . esc_html( $title ) . '</h2>';
+			if ( 'custom' === $g ) {
+				echo '<p class="marsad-sub">' . esc_html__( 'Any address that returns numbers as JSON: a campaign, a form, a shop, an internal system. Add as many as you need.', 'marsad' ) . '</p>';
+			}
+			echo '<div class="marsad-conns">';
+			foreach ( $by_group[ $g ] ?? array() as $c ) {
 				self::card( $c, $status[ $c->id() ] ?? array(), $open === $c->id() );
+			}
+			if ( 'custom' === $g ) {
+				self::add_card( 'new' === $open );
 			}
 			echo '</div>';
 		}
 		echo '</div>';
+	}
+
+	/**
+	 * The "Add a source" button: a blank custom source form. Saving it creates the source.
+	 */
+	private static function add_card( $open ) {
+		$c = new Marsad_Connector_Json( self::NEW_ID );
+		echo '<details class="marsad-conn marsad-add"' . ( $open ? ' open' : '' ) . ' id="conn-new">';
+		echo '<summary><b>' . esc_html__( '+ Add a source', 'marsad' ) . '</b></summary>';
+		echo '<p>' . esc_html( $c->description() ) . '</p>';
+		echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '">';
+		wp_nonce_field( 'marsad_save_connector' );
+		echo '<input type="hidden" name="action" value="marsad_save_connector"><input type="hidden" name="connector" value="' . esc_attr( self::NEW_ID ) . '"><input type="hidden" name="enabled" value="1">';
+		echo '<table class="form-table" role="presentation">';
+		foreach ( $c->fields() as $key => $f ) {
+			self::field( $c, $key, $f );
+		}
+		echo '</table><p class="marsad-buttons"><button class="button button-primary">' . esc_html__( 'Add and sync', 'marsad' ) . '</button></p></form>';
+		echo '</details>';
 	}
 
 	private static function card( Marsad_Connector $c, array $st, $open ) {
@@ -95,16 +124,20 @@ class Marsad_Admin_Connections {
 		}
 		echo '</table><p class="marsad-buttons"><button class="button button-primary">' . esc_html__( 'Save', 'marsad' ) . '</button></p></form>';
 
-		if ( $c->is_configured() ) {
+		$custom = Marsad_Registry::is_custom( $c->id() );
+		if ( $c->is_configured() || $custom ) {
 			echo '<div class="marsad-row">';
-			echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '">';
-			wp_nonce_field( 'marsad_test_connector' );
-			echo '<input type="hidden" name="action" value="marsad_test_connector"><input type="hidden" name="connector" value="' . esc_attr( $c->id() ) . '"><button class="button">' . esc_html__( 'Test connection', 'marsad' ) . '</button></form>';
+			if ( $c->is_configured() ) {
+				echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '">';
+				wp_nonce_field( 'marsad_test_connector' );
+				echo '<input type="hidden" name="action" value="marsad_test_connector"><input type="hidden" name="connector" value="' . esc_attr( $c->id() ) . '"><button class="button">' . esc_html__( 'Test connection', 'marsad' ) . '</button></form>';
+			}
 			echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '" class="marsad-forget">';
 			wp_nonce_field( 'marsad_forget_connector' );
 			echo '<input type="hidden" name="action" value="marsad_forget_connector"><input type="hidden" name="connector" value="' . esc_attr( $c->id() ) . '">';
 			echo '<label><input type="checkbox" name="delete_data" value="1"> ' . esc_html__( 'also delete its collected data', 'marsad' ) . '</label> ';
-			echo '<button class="button-link button-link-delete">' . esc_html__( 'Disconnect', 'marsad' ) . '</button></form>';
+			$verb = $custom ? __( 'Remove source', 'marsad' ) : __( 'Disconnect', 'marsad' );
+			echo '<button class="button-link button-link-delete">' . esc_html( $verb ) . '</button></form>';
 			echo '</div>';
 		}
 		echo '</details>';

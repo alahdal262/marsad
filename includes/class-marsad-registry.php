@@ -5,13 +5,18 @@
  * Saved shape (option marsad_connections, not autoloaded):
  *   array( id => array( 'enabled' => bool, 'values' => array( field => stored ) ) )
  * Fields of type "secret" or "textarea_secret" are stored encrypted.
+ *
+ * Custom JSON sources exist only once the user adds them (option marsad_custom_sources:
+ *   array( 'ids' => array( 'custom_1', … ), 'next' => int ) ). Ids only grow, so data
+ *   left behind by a removed source never attaches to a new one.
  */
 
 defined( 'ABSPATH' ) || exit;
 
 class Marsad_Registry {
 
-	const OPT = 'marsad_connections';
+	const OPT        = 'marsad_connections';
+	const OPT_CUSTOM = 'marsad_custom_sources';
 
 	/** @var Marsad_Connector[]|null */
 	private static $cache = null;
@@ -27,7 +32,6 @@ class Marsad_Registry {
 			'Marsad_Connector_Telegram',
 			'Marsad_Connector_Google_Play',
 			'Marsad_Connector_App_Store',
-			'Marsad_Connector_Json',
 		);
 	}
 
@@ -41,6 +45,9 @@ class Marsad_Registry {
 		$list = array();
 		foreach ( self::builtin() as $class ) {
 			$list[] = new $class();
+		}
+		foreach ( self::custom_ids() as $id ) {
+			$list[] = new Marsad_Connector_Json( $id );
 		}
 		/**
 		 * Add your own data sources: return the array with extra Marsad_Connector instances.
@@ -111,6 +118,49 @@ class Marsad_Registry {
 		);
 		update_option( self::OPT, $saved, false );
 		self::$cache = null;
+	}
+
+	/**
+	 * Ids of the custom sources the user added. Before 0.2.0 there was one built-in
+	 * JSON source with id "json"; a site that had set it up keeps it.
+	 */
+	public static function custom_ids() {
+		return self::custom()['ids'];
+	}
+
+	public static function is_custom( $id ) {
+		return in_array( $id, self::custom_ids(), true );
+	}
+
+	/** @return string the new source's id */
+	public static function add_custom() {
+		$c          = self::custom();
+		$id         = 'custom_' . $c['next'];
+		$c['ids'][] = $id;
+		$c['next']++;
+		update_option( self::OPT_CUSTOM, $c, false );
+		self::$cache = null;
+		return $id;
+	}
+
+	public static function remove_custom( $id ) {
+		$c        = self::custom();
+		$c['ids'] = array_values( array_diff( $c['ids'], array( $id ) ) );
+		update_option( self::OPT_CUSTOM, $c, false );
+		self::forget( $id );
+	}
+
+	private static function custom() {
+		$c = get_option( self::OPT_CUSTOM, null );
+		if ( ! is_array( $c ) ) {
+			$saved = self::saved();
+			$c     = array(
+				'ids'  => empty( $saved['json']['values'] ) ? array() : array( 'json' ),
+				'next' => 1,
+			);
+			update_option( self::OPT_CUSTOM, $c, false );
+		}
+		return $c;
 	}
 
 	public static function forget( $id ) {

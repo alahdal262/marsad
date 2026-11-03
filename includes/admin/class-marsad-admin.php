@@ -83,8 +83,18 @@ class Marsad_Admin {
 
 	public static function handle_save_connector() {
 		self::guard( 'save_connector' );
-		$c      = self::connector_from_post();
 		$fields = isset( $_POST['f'] ) && is_array( $_POST['f'] ) ? wp_unslash( $_POST['f'] ) : array(); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- sanitised per field type in Marsad_Registry::save().
+		if ( Marsad_Admin_Connections::NEW_ID === sanitize_key( wp_unslash( $_POST['connector'] ?? '' ) ) ) {
+			$draft = new Marsad_Connector_Json( Marsad_Admin_Connections::NEW_ID );
+			$draft->set_values( array_map( 'strval', $fields ) );
+			if ( ! $draft->is_configured() ) {
+				self::notice( 'error', __( 'Fill in the JSON address and at least one value line.', 'marsad' ) );
+				self::back( 'connections', array( 'open' => Marsad_Admin_Connections::NEW_ID ) );
+			}
+			$c = Marsad_Registry::get( Marsad_Registry::add_custom() );
+		} else {
+			$c = self::connector_from_post();
+		}
 		Marsad_Registry::save( $c, ! empty( $_POST['enabled'] ), $fields );
 		$c = Marsad_Registry::get( $c->id() );
 		if ( ! empty( $_POST['enabled'] ) && $c->is_configured() ) {
@@ -131,7 +141,11 @@ class Marsad_Admin {
 	public static function handle_forget_connector() {
 		self::guard( 'forget_connector' );
 		$c = self::connector_from_post();
-		Marsad_Registry::forget( $c->id() );
+		if ( Marsad_Registry::is_custom( $c->id() ) ) {
+			Marsad_Registry::remove_custom( $c->id() );
+		} else {
+			Marsad_Registry::forget( $c->id() );
+		}
 		Marsad_Sync::forget( $c->id() );
 		if ( ! empty( $_POST['delete_data'] ) ) {
 			Marsad_Store::delete_source( $c->id() );

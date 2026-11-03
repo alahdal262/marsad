@@ -5,6 +5,11 @@ return array(
 	'plural-forms' => 'nplurals=6; plural=(n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 ? 4 : 5);',
 	'language' => 'ar',
 	'messages' => array(
+		'+ Add a source' => '+ أضف مصدراً',
+		'Add and sync' => 'أضِف وزامِن',
+		'Any address that returns numbers as JSON: a campaign, a form, a shop, an internal system. Add as many as you need.' => 'أي رابط يعيد أرقاماً بصيغة JSON: حملة، نموذج، متجر، نظام داخلي. أضف ما تشاء منها.',
+		'Fill in the JSON address and at least one value line.' => 'املأ رابط JSON وسطراً واحداً على الأقل من القيم.',
+		'Remove source' => 'احذف المصدر',
 		'%1$s is switched off for this service account\'s Google Cloud project. Open console.cloud.google.com → APIs & Services → Library, search for "%2$s" and press Enable, then try again in a few minutes.' => 'خدمة %1$s غير مفعّلة في مشروع Google Cloud الخاص بحساب الخدمة. افتح console.cloud.google.com ← APIs & Services ← Library، وابحث عن «%2$s» واضغط Enable، ثم أعد المحاولة بعد دقائق.',
 		'%1$s – %2$s, compared with the previous period' => '%1$s – %2$s، مقارنةً بالفترة السابقة',
 		'%d days' => '%d يوماً',

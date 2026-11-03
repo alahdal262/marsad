@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.2.0
+
+- Your own sources are added with a **+ Add a source** button and can be removed again. A new install starts with none, and you can add as many as you need. A site that already set up the old single JSON source keeps it.
+
 ## 0.1.1
 
 - Running totals (followers, subscribers, campaign totals) recorded today now show on the dashboard. They were hidden until the next day because the period ends yesterday.

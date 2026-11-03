@@ -31,7 +31,7 @@ Later releases appear in **Dashboard → Updates** like any other plugin. To tur
 | Telegram | Channel or group members | Bot token (the bot must be in the channel) and `@channel` or chat ID |
 | Google Play | Daily installs, uninstalls, active devices, total users | Package name, the reports bucket (`pubsite_prod_…`), and a service account invited in Play Console |
 | App Store | Downloads, re-downloads, updates; downloads by country | App Store Connect API key (Issuer ID, Key ID, `.p8`) with Sales access, vendor number; optional Apple ID to filter one app |
-| JSON endpoint | Any numbers from a URL that returns JSON | URL and a list of `Label = path.to.value` lines |
+| Your own sources | Any numbers from a URL that returns JSON. None exist until you press **+ Add a source**; add as many as you need | URL and a list of `Label = path.to.value` lines |
 
 Every Google source uses the same kind of key: in Google Cloud, create a service account, create a JSON key for it, enable the API named on the connection card, and give the service account's email access in the product. The Connections page shows that email after you save the key, and turns "API not enabled" errors into the exact step to fix them.
 
@@ -125,7 +125,7 @@ GPL-2.0-or-later. See [LICENSE](LICENSE).
 - **فيسبوك وإنستغرام**: معرّف الصفحة أو الحساب ورمز وصول طويل الأمد.
 - **تيليغرام**: رمز بوت مضاف إلى القناة، ومعرّف القناة.
 - **App Store**: مفتاح App Store Connect API بصلاحية المبيعات ورقم المورّد.
-- **رابط JSON**: أي رابط يعيد أرقاماً، مع أسطر بصيغة `الاسم = المسار.إلى.القيمة`.
+- **مصادرك الخاصة**: لا يوجد أي منها عند التثبيت؛ اضغط **+ أضف مصدراً** في صفحة الاتصالات، وأدخل الاسم والرابط وأسطراً بصيغة `الاسم = المسار.إلى.القيمة`. أضف ما تشاء منها، واحذف أيّاً منها متى شئت.
 
 الأسرار تُخزَّن مشفّرة ولا تُعرض بعد الحفظ. اترك حقل السر فارغاً للإبقاء على القيمة المحفوظة.
 
