@@ -29,7 +29,7 @@ class Marsad_Report {
 	 */
 	public function metric( $source, $metric, array $def ) {
 		$agg = $def['agg'] ?? 'sum';
-		$cur = Marsad_Store::daily( $source, $metric, $this->range['from'], $this->range['to'] );
+		$cur = Marsad_Store::daily( $source, $metric, $this->range['from'], $this->until( $agg ) );
 		$pre = Marsad_Store::daily( $source, $metric, $this->range['prev_from'], $this->range['prev_to'] );
 		$value = Marsad_Aggregate::collapse( $cur, $agg );
 		$prev  = Marsad_Aggregate::collapse( $pre, $agg );
@@ -41,8 +41,16 @@ class Marsad_Report {
 		);
 	}
 
+	/**
+	 * Counters stop at yesterday, a finished day. Running totals (followers, campaign
+	 * totals) are recorded once a day as "now", so the latest one is today's.
+	 */
+	private function until( $agg ) {
+		return 'last' === $agg ? gmdate( 'Y-m-d' ) : $this->range['to'];
+	}
+
 	public function table( $source, $metric, array $def ) {
-		$b = Marsad_Store::breakdown( $source, $metric, $this->range['from'], $this->range['to'] );
+		$b = Marsad_Store::breakdown( $source, $metric, $this->range['from'], $this->until( $def['agg'] ?? 'sum' ) );
 		if ( 'last' === ( $def['agg'] ?? 'sum' ) ) {
 			// Snapshot tables (latest videos) show only the most recent day that has data.
 			$latest = '';

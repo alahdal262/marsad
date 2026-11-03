@@ -65,7 +65,23 @@ class Marsad_Test_Wpdb {
 		return vsprintf( $sql, $args );
 	}
 	public function query( $sql ) { $this->queries[] = $sql; return 1; }
-	public function get_results( $sql ) { $this->queries[] = $sql; return array(); }
+	/** Rows Store reads back: array( source, metric, dim, day, value ). */
+	public $fixture = array();
+	public function get_results( $sql ) {
+		$this->queries[] = $sql;
+		if ( ! preg_match( "/source='([^']*)' AND metric='([^']*)'.*BETWEEN '([^']*)' AND '([^']*)'/", $sql, $m ) ) {
+			return array();
+		}
+		$breakdown = false !== strpos( $sql, "dim<>''" );
+		$out       = array();
+		foreach ( $this->fixture as $f ) {
+			list( $source, $metric, $dim, $day, $value ) = $f;
+			if ( $source === $m[1] && $metric === $m[2] && $day >= $m[3] && $day <= $m[4] && $breakdown === ( '' !== $dim ) ) {
+				$out[] = (object) array( 'dim' => $dim, 'day' => $day, 'value' => $value );
+			}
+		}
+		return $out;
+	}
 	public function delete( $t, $w ) { $this->queries[] = 'DELETE ' . $t; return 1; }
 }
 

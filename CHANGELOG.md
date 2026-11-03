@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.1
+
+- Running totals (followers, subscribers, campaign totals) recorded today now show on the dashboard. They were hidden until the next day because the period ends yesterday.
+
 ## 0.1.0
 
 First release.

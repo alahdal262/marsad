@@ -4,7 +4,7 @@ Tags: analytics, statistics, dashboard, google analytics, social media
 Requires at least: 6.5
 Tested up to: 6.8
 Requires PHP: 7.4
-Stable tag: 0.1.0
+Stable tag: 0.1.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -45,6 +45,9 @@ Administrators by default. Choose more roles under Marsad → Settings.
 Hourly by default, through WP-Cron. Use "Sync now" on the dashboard to refresh immediately.
 
 == Changelog ==
+
+= 0.1.1 =
+* Running totals (followers, campaign totals) recorded today now show on the dashboard instead of a day late.
 
 = 0.1.0 =
 * First release.
