@@ -6,6 +6,7 @@ return array (
   'language' => 'fr',
   'messages' => 
   array (
+    'Play Console has not given %s access to the reports yet. In Play Console open Users and permissions, add this e-mail (or edit it), and tick the account permission "View app information and download bulk reports (read-only)". Google can take up to 24 hours to apply it.' => 'Play Console n\'a pas encore donné à %s l\'accès aux rapports. Dans Play Console, ouvrez Utilisateurs et autorisations, ajoutez cette adresse (ou modifiez-la) et cochez l\'autorisation de compte "View app information and download bulk reports (read-only)". Google peut mettre jusqu\'à 24 heures pour l\'appliquer.',
     'App Store' => 'App Store',
     'First-time downloads, re-downloads and updates of your iPhone, iPad and Apple TV apps, by country.' => 'Premiers téléchargements, retéléchargements et mises à jour de vos apps iPhone, iPad et Apple TV, par pays.',
     'Issuer ID' => 'ID de l\'émetteur',

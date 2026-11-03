@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.5.2
+
+- Google Play: a 403 from the reports bucket now names the account and the exact Play Console permission to grant ("View app information and download bulk reports"), in every language, instead of the raw storage error.
+
 ## 0.5.1
 
 - "Connect with Google" appears only when Marsad Connect can actually sign in (checked through its new `status.php`); otherwise the card explains the way that works today instead of sending people to an error page.

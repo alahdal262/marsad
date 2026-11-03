@@ -5,6 +5,7 @@ return array(
 	'plural-forms' => 'nplurals=6; plural=(n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 ? 4 : 5);',
 	'language' => 'ar',
 	'messages' => array(
+		'Play Console has not given %s access to the reports yet. In Play Console open Users and permissions, add this e-mail (or edit it), and tick the account permission "View app information and download bulk reports (read-only)". Google can take up to 24 hours to apply it.' => 'لم يمنح Play Console الحساب %s صلاحية التقارير بعد. افتح في Play Console صفحة Users and permissions، وأضف هذا البريد (أو عدّله)، وفعّل صلاحية الحساب "View app information and download bulk reports (read-only)". قد يستغرق جوجل حتى 24 ساعة لتطبيقها.',
 		'One-click Google sign-in is not available right now. Each Google card below still works with a service account key: open "Advanced" in the card and follow its link. YouTube needs only the channel link.' => 'تسجيل الدخول بجوجل بضغطة واحدة غير متاح الآن. ما زالت كل بطاقة جوجل بالأسفل تعمل بمفتاح حساب خدمة: افتح «خيارات متقدمة» في البطاقة واتبع الرابط. أما يوتيوب فيكفيه رابط القناة.',
 		'One-click Google sign-in is not available right now. Use a service account key under "Advanced" in each Google card.' => 'تسجيل الدخول بجوجل بضغطة واحدة غير متاح الآن. استخدم مفتاح حساب خدمة من «خيارات متقدمة» في كل بطاقة جوجل.',
 		'Drafts' => 'المسودات',

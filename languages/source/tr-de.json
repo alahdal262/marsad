@@ -222,6 +222,7 @@
   "Platform": "Plattform",
   "Platforms & apps": "Plattformen & Apps",
   "Play Console": "Play Console",
+  "Play Console has not given %s access to the reports yet. In Play Console open Users and permissions, add this e-mail (or edit it), and tick the account permission \"View app information and download bulk reports (read-only)\". Google can take up to 24 hours to apply it.": "Die Play Console hat %s noch keinen Zugriff auf die Berichte gegeben. Öffnen Sie in der Play Console „Nutzer und Berechtigungen“, fügen Sie diese E-Mail-Adresse hinzu (oder bearbeiten Sie sie) und aktivieren Sie die Kontoberechtigung \"View app information and download bulk reports (read-only)\". Google kann bis zu 24 Stunden brauchen, um sie zu übernehmen.",
   "Play Console → Download reports → Statistics → \"Copy Cloud Storage URI\": pubsite_prod_… (without gs://).": "Play Console → Download reports → Statistics → \"Copy Cloud Storage URI\": pubsite_prod_… (ohne gs://).",
   "Play writes the reports once a day; new numbers appear with a 1–2 day delay.": "Play schreibt die Berichte einmal täglich; neue Zahlen erscheinen mit 1–2 Tagen Verzögerung.",
   "Plugins": "Plugins",

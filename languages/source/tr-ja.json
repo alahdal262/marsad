@@ -220,6 +220,7 @@
   "Platform": "プラットフォーム",
   "Platforms & apps": "プラットフォームとアプリ",
   "Play Console": "Play Console",
+  "Play Console has not given %s access to the reports yet. In Play Console open Users and permissions, add this e-mail (or edit it), and tick the account permission \"View app information and download bulk reports (read-only)\". Google can take up to 24 hours to apply it.": "Play Console はまだ %s にレポートへのアクセス権を与えていません。Play Console で「ユーザーと権限」を開き、このメールアドレスを追加（または編集）して、アカウント権限 \"View app information and download bulk reports (read-only)\" にチェックを入れてください。反映まで最大 24 時間かかることがあります。",
   "Play Console → Download reports → Statistics → \"Copy Cloud Storage URI\": pubsite_prod_… (without gs://).": "Play Console → レポートのダウンロード → 統計情報 → \"Copy Cloud Storage URI\"：pubsite_prod_…（gs:// は除く）。",
   "Play writes the reports once a day; new numbers appear with a 1–2 day delay.": "Play のレポートは1日1回作成されるため、新しい数値は1～2日遅れて表示されます。",
   "Plugins": "プラグイン",

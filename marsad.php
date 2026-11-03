@@ -3,7 +3,7 @@
  * Plugin Name:       Marsad — Unified Analytics
  * Plugin URI:        https://github.com/alahdal262/marsad
  * Description:       One dashboard for every number your site lives on: Google Analytics 4, Search Console, YouTube, Facebook, Instagram, Telegram, Google Play, the App Store, WordPress itself, and any JSON endpoint you own.
- * Version:           0.5.1
+ * Version:           0.5.2
  * Requires at least: 6.5
  * Requires PHP:      7.4
  * Author:            Marsad contributors
@@ -16,7 +16,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'MARSAD_VERSION', '0.5.1' );
+define( 'MARSAD_VERSION', '0.5.2' );
 define( 'MARSAD_FILE', __FILE__ );
 define( 'MARSAD_DIR', plugin_dir_path( __FILE__ ) );
 define( 'MARSAD_URL', plugin_dir_url( __FILE__ ) );

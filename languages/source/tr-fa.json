@@ -222,6 +222,7 @@
   "Platform": "پلتفرم",
   "Platforms & apps": "پلتفرم‌ها و برنامه‌ها",
   "Play Console": "Play Console",
+  "Play Console has not given %s access to the reports yet. In Play Console open Users and permissions, add this e-mail (or edit it), and tick the account permission \"View app information and download bulk reports (read-only)\". Google can take up to 24 hours to apply it.": "Play Console هنوز به %s دسترسی به گزارش‌ها نداده است. در Play Console بخش Users and permissions را باز کنید، این ایمیل را اضافه (یا ویرایش) کنید و مجوز حساب \"View app information and download bulk reports (read-only)\" را فعال کنید. اعمال آن ممکن است تا 24 ساعت طول بکشد.",
   "Play Console → Download reports → Statistics → \"Copy Cloud Storage URI\": pubsite_prod_… (without gs://).": "Play Console ← Download reports ← Statistics ← \"Copy Cloud Storage URI\": pubsite_prod_… (بدون gs://).",
   "Play writes the reports once a day; new numbers appear with a 1–2 day delay.": "Google Play گزارش‌ها را روزی یک بار می‌نویسد؛ عددهای تازه با 1–2 روز تأخیر نمایش داده می‌شوند.",
   "Plugins": "افزونه‌ها",

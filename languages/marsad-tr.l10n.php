@@ -6,6 +6,7 @@ return array (
   'language' => 'tr',
   'messages' => 
   array (
+    'Play Console has not given %s access to the reports yet. In Play Console open Users and permissions, add this e-mail (or edit it), and tick the account permission "View app information and download bulk reports (read-only)". Google can take up to 24 hours to apply it.' => 'Play Console, %s hesabına henüz raporlara erişim vermedi. Play Console\'da Kullanıcılar ve izinler bölümünü açın, bu e-postayı ekleyin (veya düzenleyin) ve "View app information and download bulk reports (read-only)" hesap iznini işaretleyin. Google\'ın bunu uygulaması 24 saati bulabilir.',
     'One-click Google sign-in is not available right now. Each Google card below still works with a service account key: open "Advanced" in the card and follow its link. YouTube needs only the channel link.' => 'Tek tıkla Google girişi şu anda kullanılamıyor. Aşağıdaki her Google kartı hizmet hesabı anahtarıyla yine çalışır: kartta "Gelişmiş" bölümünü açın ve bağlantıyı izleyin. YouTube için yalnızca kanal bağlantısı yeterlidir.',
     'One-click Google sign-in is not available right now. Use a service account key under "Advanced" in each Google card.' => 'Tek tıkla Google girişi şu anda kullanılamıyor. Her Google kartında "Gelişmiş" altında bir hizmet hesabı anahtarı kullanın.',
     'App Store' => 'App Store',

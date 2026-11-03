@@ -6,6 +6,7 @@ return array (
   'language' => 'zh',
   'messages' => 
   array (
+    'Play Console has not given %s access to the reports yet. In Play Console open Users and permissions, add this e-mail (or edit it), and tick the account permission "View app information and download bulk reports (read-only)". Google can take up to 24 hours to apply it.' => 'Play 管理中心尚未授予 %s 访问报告的权限。请在 Play 管理中心打开「用户和权限」，添加此邮箱（或编辑它），并勾选账号权限 "View app information and download bulk reports (read-only)"。Google 最多可能需要 24 小时才能生效。',
     'One-click Google sign-in is not available right now. Each Google card below still works with a service account key: open "Advanced" in the card and follow its link. YouTube needs only the channel link.' => '一键 Google 登录暂不可用。下方每张 Google 卡片仍可使用服务账号密钥：在卡片中打开「高级」并按其中的链接操作。YouTube 只需要频道链接。',
     'One-click Google sign-in is not available right now. Use a service account key under "Advanced" in each Google card.' => '一键 Google 登录暂不可用。请在每张 Google 卡片的「高级」中使用服务账号密钥。',
     'App Store' => 'App Store',

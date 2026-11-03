@@ -149,3 +149,14 @@ function test_http_json_raises_api_message() {
 	};
 	throws( function () { Marsad_Http::json( 'GET', 'https://x' ); }, 'HTTP 403: Permission denied' );
 }
+
+function test_play_permission_error_names_the_exact_fix() {
+	marsad_test_connect_google();
+	$c = new Marsad_Connector_Google_Play();
+	$c->set_values( array( 'package' => 'com.x', 'bucket' => 'pubsite_prod_1' ) );
+	Marsad_Http::$mock = function () {
+		return array( 'code' => 403, 'body' => '{"error":{"message":"owner@example.com does not have storage.objects.get access"}}', 'headers' => array() );
+	};
+	throws( function () use ( $c ) { $c->fetch( '2026-10-01', '2026-10-02' ); }, 'owner@example.com' );
+	throws( function () use ( $c ) { $c->fetch( '2026-10-01', '2026-10-02' ); }, 'download bulk reports' );
+}

@@ -80,6 +80,17 @@ class Marsad_Connector_Google_Play extends Marsad_Connector {
 			if ( 404 === $res['code'] ) {
 				continue; // Month not written yet.
 			}
+			if ( 403 === $res['code'] ) {
+				// Play reports are readable only by accounts Play Console allows; say exactly where.
+				$who = '' !== trim( (string) $this->get( 'service_account' ) ) ? Marsad_Google_Auth::client_email( $this->get( 'service_account' ) ) : Marsad_Google_Account::email();
+				throw new Marsad_Exception(
+					sprintf(
+						/* translators: %s: Google account or service account e-mail */
+						__( 'Play Console has not given %s access to the reports yet. In Play Console open Users and permissions, add this e-mail (or edit it), and tick the account permission "View app information and download bulk reports (read-only)". Google can take up to 24 hours to apply it.', 'marsad' ),
+						$who
+					)
+				);
+			}
 			if ( 200 !== $res['code'] ) {
 				throw new Marsad_Exception( Marsad_Http::error_message( $res['code'], json_decode( $res['body'], true ), $res['body'] ) );
 			}
