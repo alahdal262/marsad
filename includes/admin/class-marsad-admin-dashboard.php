@@ -319,10 +319,14 @@ class Marsad_Admin_Dashboard {
 		echo '</b><span>' . esc_html__( 'Checked on every sync, and live when you open this page.', 'marsad' ) . '</span></div></div>';
 
 		echo '<div class="marsad-cols">';
-		$resp = self::metric( 'site', 'response_ms' );
-		self::panel_open( __( 'Home page response time', 'marsad' ), __( 'Milliseconds, measured from this server on each sync', 'marsad' ), 'wide', '<b class="marsad-big">' . esc_html( Marsad_Admin::format( $resp['value'] ?? null ) ) . '</b>' );
+		// The headline is the latest measurement (today's counts); the bars are finished days.
+		$resp   = self::metric( 'site', 'response_ms' );
+		$latest = self::enabled( 'site' ) ? $report->metric( 'site', 'response_ms', array( 'agg' => 'last' ) )['value'] : null;
+		self::panel_open( __( 'Home page response time', 'marsad' ), __( 'Milliseconds, measured from this server on each sync', 'marsad' ), 'wide', '<b class="marsad-big">' . esc_html( Marsad_Admin::format( $latest ) ) . '</b>' );
 		if ( $resp && null !== $resp['value'] ) {
 			self::bars( array_map( function ( $v ) { return null === $v ? 0 : $v; }, $resp['series'] ), $report->days, __( 'ms', 'marsad' ) );
+		} elseif ( null !== $latest ) {
+			self::callout( __( 'The daily chart starts tomorrow, after the first full day of measurements.', 'marsad' ) );
 		} else {
 			self::callout( __( 'The first measurement appears after the next sync.', 'marsad' ) );
 		}

@@ -5,6 +5,7 @@ return array(
 	'plural-forms' => 'nplurals=6; plural=(n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 ? 4 : 5);',
 	'language' => 'ar',
 	'messages' => array(
+		'The daily chart starts tomorrow, after the first full day of measurements.' => 'يبدأ الرسم اليومي غداً بعد اكتمال أول يوم من القياسات.',
 		'Site & hosting' => 'الموقع والاستضافة',
 		'Totals of posts, pages, media, comments and users, plus database size, uploads size and response time.' => 'إجمالي المقالات والصفحات والوسائط والتعليقات والمستخدمين، مع حجم قاعدة البيانات والملفات المرفوعة وزمن الاستجابة.',
 		'Pages' => 'الصفحات',

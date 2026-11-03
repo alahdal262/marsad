@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.3.1
+
+- Hosting tab shows the latest home page response time right away, instead of a dash until the first full day is recorded.
+
 ## 0.3.0
 
 - New dashboard in four tabs: Overview, Content & users, Platforms & apps, Hosting.

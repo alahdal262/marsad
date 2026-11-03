@@ -102,6 +102,13 @@ function test_hosting_tab_shows_stack_storage_and_health() {
 	}
 }
 
+function test_hosting_shows_todays_response_time_before_any_full_day() {
+	$GLOBALS['wpdb']->fixture[] = array( 'site', 'response_ms', '', gmdate( 'Y-m-d' ), 12 );
+	$h = marsad_test_render_tab( 'hosting' );
+	check( false !== strpos( $h, '<b class="marsad-big">12</b>' ), 'latest measurement in the header' );
+	check( false !== strpos( $h, 'The daily chart starts tomorrow' ), 'explains the empty chart' );
+}
+
 function test_unknown_tab_falls_back_to_overview() {
 	$h = marsad_test_render_tab( 'nope' );
 	check( false !== strpos( $h, 'Overview' ) );
