@@ -1,0 +1,130 @@
+/* Marsad admin. Logical properties throughout so the same file works in RTL and LTR. */
+
+.marsad {
+	--m-bg: #fff;
+	--m-line: #e5e7eb;
+	--m-mute: #6b7280;
+	--m-ink: #111827;
+	--m-good: #15803d;
+	--m-bad: #b91c1c;
+	--m-radius: 12px;
+	color: var(--m-ink);
+	max-width: 1280px;
+}
+
+.marsad h1 { margin-block-end: 2px; }
+.marsad-sub, .marsad-muted { color: var(--m-mute); margin: 0; font-size: 13px; }
+
+.marsad-top {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 12px;
+	align-items: flex-end;
+	justify-content: space-between;
+	margin-block: 12px 18px;
+}
+.marsad-actions { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.marsad-actions form { margin: 0; }
+
+.marsad-ranges { display: inline-flex; border: 1px solid var(--m-line); border-radius: 8px; overflow: hidden; background: var(--m-bg); }
+.marsad-ranges a { padding: 6px 12px; text-decoration: none; color: var(--m-ink); border-inline-end: 1px solid var(--m-line); }
+.marsad-ranges a:last-child { border-inline-end: 0; }
+.marsad-ranges a.is-on { background: #1d2327; color: #fff; }
+
+/* Headline strip */
+.marsad-headline {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+	gap: 12px;
+	margin-block-end: 22px;
+}
+.marsad-hl {
+	background: var(--m-bg);
+	border: 1px solid var(--m-line);
+	border-block-start: 4px solid var(--c);
+	border-radius: var(--m-radius);
+	padding: 14px 16px 8px;
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+	color: var(--c);
+}
+.marsad-hl-label { color: var(--m-mute); font-size: 13px; }
+.marsad-hl b { color: var(--m-ink); font-size: 28px; line-height: 1.2; font-variant-numeric: tabular-nums; }
+
+/* Source sections */
+.marsad-source {
+	background: var(--m-bg);
+	border: 1px solid var(--m-line);
+	border-radius: var(--m-radius);
+	padding: 16px 18px 18px;
+	margin-block-end: 18px;
+}
+.marsad-source header { display: flex; flex-wrap: wrap; gap: 10px; align-items: baseline; margin-block-end: 12px; }
+.marsad-source h2 { margin: 0; font-size: 18px; }
+.marsad-err { background: #fef2f2; color: var(--m-bad); border-radius: 999px; padding: 2px 10px; font-size: 12px; }
+
+.marsad-kpis { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 10px; }
+.marsad-kpi {
+	border: 1px solid var(--m-line);
+	border-radius: 10px;
+	padding: 10px 12px 6px;
+	display: flex;
+	flex-direction: column;
+	gap: 2px;
+	color: #2563eb;
+}
+.marsad-kpi span { color: var(--m-mute); font-size: 12px; }
+.marsad-kpi b { color: var(--m-ink); font-size: 20px; font-variant-numeric: tabular-nums; }
+
+.marsad-change { font-size: 12px; font-weight: 600; }
+.marsad-good { color: var(--m-good); }
+.marsad-bad { color: var(--m-bad); }
+.marsad-flat { color: var(--m-mute); }
+
+.marsad-spark { width: 100%; height: 32px; display: block; margin-block-start: 4px; }
+
+.marsad-chartbox { margin-block-start: 16px; }
+.marsad-chart { width: 100%; height: auto; display: block; direction: ltr; }
+.marsad-grid { stroke: #f1f5f9; }
+.marsad-axis { fill: var(--m-mute); font-size: 11px; }
+.marsad-legend { display: flex; flex-wrap: wrap; gap: 14px; margin: 6px 0 0; padding: 0; list-style: none; font-size: 12px; color: var(--m-mute); }
+.marsad-legend li::before { content: ""; display: inline-block; width: 10px; height: 10px; border-radius: 3px; background: var(--c); margin-inline-end: 6px; vertical-align: -1px; }
+
+.marsad-tables { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 14px; margin-block-start: 16px; }
+.marsad-table h3 { margin: 0 0 8px; font-size: 14px; }
+.marsad-table ol { margin: 0; padding: 0; list-style: none; }
+.marsad-table li { position: relative; display: flex; justify-content: space-between; gap: 10px; padding: 5px 8px; border-radius: 6px; font-size: 13px; overflow: hidden; }
+.marsad-table li i { position: absolute; inset-block: 0; inset-inline-start: 0; background: #eff6ff; z-index: 0; border-radius: 6px; }
+.marsad-table li > span, .marsad-table li > b { position: relative; z-index: 1; }
+.marsad-dim { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+.marsad-table b { font-variant-numeric: tabular-nums; }
+
+.marsad-empty { background: #f0f6fc; border: 1px dashed #72aee6; border-radius: var(--m-radius); padding: 18px 20px; margin-block-end: 18px; }
+.marsad-empty h2 { margin-block-start: 0; }
+
+/* Connections */
+.marsad-group { margin-block: 22px 8px; }
+.marsad-conns { display: grid; gap: 10px; }
+.marsad-conn { background: var(--m-bg); border: 1px solid var(--m-line); border-inline-start: 4px solid #c3c4c7; border-radius: 10px; padding: 0 16px; }
+.marsad-conn[open] { padding-block-end: 14px; }
+.marsad-conn summary { cursor: pointer; padding: 12px 0; display: flex; gap: 10px; align-items: center; list-style: none; }
+.marsad-conn summary::-webkit-details-marker { display: none; }
+.marsad-conn summary b { font-size: 15px; }
+.marsad-pill { font-size: 12px; border-radius: 999px; padding: 2px 10px; background: #f0f0f1; color: var(--m-mute); }
+.marsad-s-ok { border-inline-start-color: #16a34a; }
+.marsad-s-ok .marsad-pill { background: #dcfce7; color: var(--m-good); }
+.marsad-s-bad { border-inline-start-color: #dc2626; }
+.marsad-s-bad .marsad-pill { background: #fee2e2; color: var(--m-bad); }
+.marsad-s-wait { border-inline-start-color: #d97706; }
+.marsad-steps { margin-inline-start: 18px; color: var(--m-mute); }
+.marsad-req { color: var(--m-bad); }
+.marsad-row { display: flex; flex-wrap: wrap; gap: 16px; align-items: center; }
+.marsad-row form { margin: 0; }
+.marsad-forget label { color: var(--m-mute); font-size: 12px; }
+.marsad-copy { cursor: copy; user-select: all; }
+
+@media (max-width: 600px) {
+	.marsad-hl b { font-size: 22px; }
+	.marsad-tables { grid-template-columns: 1fr; }
+}

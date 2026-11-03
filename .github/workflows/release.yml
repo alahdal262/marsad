@@ -1,0 +1,40 @@
+name: Release
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: openssl, mbstring, zlib
+          coverage: none
+
+      - name: Tag must match the plugin version
+        run: |
+          tag="${GITHUB_REF_NAME#v}"
+          header=$(sed -n 's/^ \* Version:[[:space:]]*//p' marsad.php)
+          const=$(sed -n "s/.*define( 'MARSAD_VERSION', '\([^']*\)'.*/\1/p" marsad.php)
+          stable=$(sed -n 's/^Stable tag:[[:space:]]*//p' readme.txt)
+          echo "tag=$tag header=$header const=$const stable=$stable"
+          [ "$tag" = "$header" ] && [ "$tag" = "$const" ] && [ "$tag" = "$stable" ]
+
+      - name: Tests
+        run: php tests/run.php
+
+      - name: Build marsad.zip
+        run: bin/build-zip.sh
+
+      - name: Publish release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          notes=$(awk -v v="## ${GITHUB_REF_NAME#v}" '$0==v{f=1;next} /^## /{f=0} f' CHANGELOG.md)
+          gh release create "$GITHUB_REF_NAME" dist/marsad.zip --title "Marsad $GITHUB_REF_NAME" --notes "${notes:-Release $GITHUB_REF_NAME}"
