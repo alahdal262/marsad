@@ -2,13 +2,14 @@
 /**
  * Storage for normalised metrics: one row per (source, metric, dimension, day).
  * dim '' is the day's total; any other dim is a breakdown (a page, a country, a platform).
+ * install() also creates the range snapshot table (see Marsad_Snapshots).
  */
 
 defined( 'ABSPATH' ) || exit;
 
 class Marsad_Store {
 
-	const DB_VERSION = 1;
+	const DB_VERSION = 2;
 	const OPT_DB     = 'marsad_db_version';
 
 	public static function table() {
@@ -18,24 +19,39 @@ class Marsad_Store {
 
 	public static function install() {
 		global $wpdb;
-		require_once ABSPATH . 'wp-admin/includes/upgrade.php';
-		$table   = self::table();
-		$charset = $wpdb->get_charset_collate();
+		if ( ! function_exists( 'dbDelta' ) ) {
+			require_once ABSPATH . 'wp-admin/includes/upgrade.php';
+		}
+		$table    = self::table();
+		$snapshot = Marsad_Snapshots::table();
+		$charset  = $wpdb->get_charset_collate();
 		// dim is hashed into dim_key so the unique index stays short whatever the page path or title length.
 		dbDelta(
-			"CREATE TABLE {$table} (
-				id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-				source varchar(40) NOT NULL,
-				metric varchar(60) NOT NULL,
-				dim varchar(500) NOT NULL DEFAULT '',
-				dim_key char(32) NOT NULL DEFAULT '',
-				day date NOT NULL,
-				value double NOT NULL DEFAULT 0,
-				updated_at datetime NOT NULL,
-				PRIMARY KEY  (id),
-				UNIQUE KEY row_key (source,metric,dim_key,day),
-				KEY lookup (source,metric,day)
-			) {$charset};"
+			array(
+				"CREATE TABLE {$table} (
+					id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+					source varchar(40) NOT NULL,
+					metric varchar(60) NOT NULL,
+					dim varchar(500) NOT NULL DEFAULT '',
+					dim_key char(32) NOT NULL DEFAULT '',
+					day date NOT NULL,
+					value double NOT NULL DEFAULT 0,
+					updated_at datetime NOT NULL,
+					PRIMARY KEY  (id),
+					UNIQUE KEY row_key (source,metric,dim_key,day),
+					KEY lookup (source,metric,day)
+				) {$charset};",
+				"CREATE TABLE {$snapshot} (
+					id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+					source varchar(40) NOT NULL,
+					range_key varchar(10) NOT NULL,
+					report varchar(80) NOT NULL,
+					payload longtext NOT NULL,
+					fetched_at datetime NOT NULL,
+					PRIMARY KEY  (id),
+					UNIQUE KEY srr (source,range_key,report)
+				) {$charset};",
+			)
 		);
 		update_option( self::OPT_DB, self::DB_VERSION, false );
 	}
@@ -134,6 +150,8 @@ class Marsad_Store {
 	public static function drop() {
 		global $wpdb;
 		$wpdb->query( 'DROP TABLE IF EXISTS ' . self::table() ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+		$wpdb->query( 'DROP TABLE IF EXISTS ' . Marsad_Snapshots::table() ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+		delete_option( Marsad_Snapshots::OPT_ERRORS );
 		delete_option( self::OPT_DB );
 	}
 }

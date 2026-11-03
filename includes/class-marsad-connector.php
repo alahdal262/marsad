@@ -94,6 +94,38 @@ abstract class Marsad_Connector {
 		return gmdate( 'Y-m-d', time() - 365 * DAY_IN_SECONDS );
 	}
 
+	/** Sources that can answer for a whole range (deduplicated users, full tables) say so here. */
+	public function supports_snapshots(): bool {
+		return false;
+	}
+
+	/**
+	 * The source's own reports for one range, in the payload shapes of Marsad_Snapshots.
+	 * A report that fails alone can be dropped and noted with Marsad_Snapshots::record_error().
+	 *
+	 * @param string $range_key one of Marsad_Snapshots::RANGES
+	 * @param array  $range     from Marsad_Snapshots::range(): from, to, prev_from|null, prev_to|null
+	 * @return array report_key => payload
+	 * @throws Marsad_Exception
+	 */
+	public function snapshots( $range_key, array $range ): array {
+		return array();
+	}
+
+	/** Translated labels for metric/dimension keys used in this connector's payloads. */
+	public function snapshot_labels(): array {
+		return array();
+	}
+
+	/**
+	 * Formats of keys Marsad_Snapshots::FORMATS does not know, or knows differently for this source.
+	 *
+	 * @return array key => number|percent|decimal|seconds|duration|text|link|country
+	 */
+	public function snapshot_formats(): array {
+		return array();
+	}
+
 	public function set_values( array $values ) {
 		$this->values = $values;
 	}

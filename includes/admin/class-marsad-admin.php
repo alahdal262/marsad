@@ -123,7 +123,8 @@ class Marsad_Admin {
 	public static function handle_sync_now() {
 		self::guard( 'sync_now' );
 		delete_transient( Marsad_Sync::LOCK );
-		Marsad_Sync::run_all();
+		// Someone is waiting for the result, so range snapshots get longer than on cron.
+		Marsad_Sync::run_all( 90 );
 		$bad = array();
 		foreach ( Marsad_Sync::status() as $id => $st ) {
 			$c = Marsad_Registry::get( $id );
@@ -152,6 +153,7 @@ class Marsad_Admin {
 		Marsad_Sync::forget( $c->id() );
 		if ( ! empty( $_POST['delete_data'] ) ) {
 			Marsad_Store::delete_source( $c->id() );
+			Marsad_Snapshots::delete_source( $c->id() );
 		}
 		self::notice( 'success', $c->label() . ': ' . __( 'disconnected.', 'marsad' ) );
 		self::back( 'connections' );

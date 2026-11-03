@@ -43,6 +43,11 @@ class Marsad_Report {
 		return $this->all ? 0 : $this->length();
 	}
 
+	/** The snapshot range this view reads: '7', '28', '90', '365' or 'all'. */
+	public function range_key(): string {
+		return $this->all ? 'all' : (string) $this->length();
+	}
+
 	/**
 	 * One metric of one source: value over the range, previous-period value, change, series.
 	 */

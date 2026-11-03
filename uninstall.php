@@ -7,8 +7,9 @@ defined( 'WP_UNINSTALL_PLUGIN' ) || exit;
 
 global $wpdb;
 $wpdb->query( 'DROP TABLE IF EXISTS ' . $wpdb->prefix . 'marsad_metrics' ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.SchemaChange
+$wpdb->query( 'DROP TABLE IF EXISTS ' . $wpdb->prefix . 'marsad_snapshots' ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.SchemaChange
 
-foreach ( array( 'marsad_settings', 'marsad_connections', 'marsad_status', 'marsad_db_version' ) as $opt ) {
+foreach ( array( 'marsad_settings', 'marsad_connections', 'marsad_status', 'marsad_db_version', 'marsad_snapshot_errors' ) as $opt ) {
 	delete_option( $opt );
 }
 delete_site_transient( 'marsad_release' );
