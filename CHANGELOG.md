@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.3.0
+
+- New dashboard in four tabs: Overview, Content & users, Platforms & apps, Hosting.
+- New always-on "Site & hosting" source, recorded daily: totals of posts, pages, images, videos, comments by status, users by role, categories and tags; database and uploads size; home page response time.
+- Hosting tab: software versions, plugins, upload limit, HTTPS, debug mode, late scheduled tasks and failing sources.
+- Daily publishing bars with an average line, ranked lists, stacked bars for users and comments, and custom sources shown as funnels.
+
 ## 0.2.0
 
 - Your own sources are added with a **+ Add a source** button and can be removed again. A new install starts with none, and you can add as many as you need. A site that already set up the old single JSON source keeps it.

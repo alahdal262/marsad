@@ -65,6 +65,8 @@ class Marsad_Test_Wpdb {
 		return vsprintf( $sql, $args );
 	}
 	public function query( $sql ) { $this->queries[] = $sql; return 1; }
+	public function db_server_info() { return '11.8.9-MariaDB'; }
+	public function get_row( $sql ) { $this->queries[] = $sql; return null; }
 	/** Rows Store reads back: array( source, metric, dim, day, value ). */
 	public $fixture = array();
 	public function get_results( $sql ) {

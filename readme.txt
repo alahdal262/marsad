@@ -4,7 +4,7 @@ Tags: analytics, statistics, dashboard, google analytics, social media
 Requires at least: 6.5
 Tested up to: 6.8
 Requires PHP: 7.4
-Stable tag: 0.2.0
+Stable tag: 0.3.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -45,6 +45,9 @@ Administrators by default. Choose more roles under Marsad → Settings.
 Hourly by default, through WP-Cron. Use "Sync now" on the dashboard to refresh immediately.
 
 == Changelog ==
+
+= 0.3.0 =
+* New dashboard in four tabs, and a Site & hosting source with content totals, storage and response time.
 
 = 0.2.0 =
 * Your own sources are added with an "Add a source" button; none exist on a new install.

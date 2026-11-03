@@ -2,108 +2,212 @@
 
 .marsad {
 	--m-bg: #fff;
-	--m-line: #e5e7eb;
-	--m-mute: #6b7280;
+	--m-ground: #f4f5f7;
+	--m-line: #e3e6eb;
+	--m-soft: #eef1f5;
+	--m-mute: #5b6472;
+	--m-faint: #b8c0cc;
 	--m-ink: #111827;
-	--m-good: #15803d;
+	--m-accent: #1d4ed8;
+	--m-good: #047857;
 	--m-bad: #b91c1c;
-	--m-radius: 12px;
+	--m-warn: #b45309;
+	--m-radius: 14px;
 	color: var(--m-ink);
-	max-width: 1280px;
+	max-width: 1360px;
+	font-family: "IBM Plex Sans Arabic", -apple-system, BlinkMacSystemFont, "Segoe UI", Tahoma, Arial, sans-serif;
+	font-variant-numeric: tabular-nums;
 }
-
-.marsad h1 { margin-block-end: 2px; }
+.marsad h1, .marsad h2, .marsad h3, .marsad h4 { color: var(--m-ink); }
 .marsad-sub, .marsad-muted { color: var(--m-mute); margin: 0; font-size: 13px; }
-
-.marsad-top {
-	display: flex;
-	flex-wrap: wrap;
-	gap: 12px;
-	align-items: flex-end;
-	justify-content: space-between;
-	margin-block: 12px 18px;
-}
-.marsad-actions { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
-.marsad-actions form { margin: 0; }
-
-.marsad-ranges { display: inline-flex; border: 1px solid var(--m-line); border-radius: 8px; overflow: hidden; background: var(--m-bg); }
-.marsad-ranges a { padding: 6px 12px; text-decoration: none; color: var(--m-ink); border-inline-end: 1px solid var(--m-line); }
-.marsad-ranges a:last-child { border-inline-end: 0; }
-.marsad-ranges a.is-on { background: #1d2327; color: #fff; }
-
-/* Headline strip */
-.marsad-headline {
-	display: grid;
-	grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
-	gap: 12px;
-	margin-block-end: 22px;
-}
-.marsad-hl {
-	background: var(--m-bg);
-	border: 1px solid var(--m-line);
-	border-block-start: 4px solid var(--c);
-	border-radius: var(--m-radius);
-	padding: 14px 16px 8px;
-	display: flex;
-	flex-direction: column;
-	gap: 4px;
-	color: var(--c);
-}
-.marsad-hl-label { color: var(--m-mute); font-size: 13px; }
-.marsad-hl b { color: var(--m-ink); font-size: 28px; line-height: 1.2; font-variant-numeric: tabular-nums; }
-
-/* Source sections */
-.marsad-source {
-	background: var(--m-bg);
-	border: 1px solid var(--m-line);
-	border-radius: var(--m-radius);
-	padding: 16px 18px 18px;
-	margin-block-end: 18px;
-}
-.marsad-source header { display: flex; flex-wrap: wrap; gap: 10px; align-items: baseline; margin-block-end: 12px; }
-.marsad-source h2 { margin: 0; font-size: 18px; }
-.marsad-err { background: #fef2f2; color: var(--m-bad); border-radius: 999px; padding: 2px 10px; font-size: 12px; }
-
-.marsad-kpis { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 10px; }
-.marsad-kpi {
-	border: 1px solid var(--m-line);
-	border-radius: 10px;
-	padding: 10px 12px 6px;
-	display: flex;
-	flex-direction: column;
-	gap: 2px;
-	color: #2563eb;
-}
-.marsad-kpi span { color: var(--m-mute); font-size: 12px; }
-.marsad-kpi b { color: var(--m-ink); font-size: 20px; font-variant-numeric: tabular-nums; }
-
-.marsad-change { font-size: 12px; font-weight: 600; }
 .marsad-good { color: var(--m-good); }
 .marsad-bad { color: var(--m-bad); }
 .marsad-flat { color: var(--m-mute); }
 
-.marsad-spark { width: 100%; height: 32px; display: block; margin-block-start: 4px; }
+/* ── Buttons, pills ─────────────────────────────────────────────── */
+.marsad-btn {
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+	min-height: 40px;
+	padding: 0 16px;
+	border-radius: 10px;
+	border: 1px solid #c9cfd8;
+	background: var(--m-bg);
+	color: var(--m-ink);
+	font: inherit;
+	font-size: 14px;
+	font-weight: 600;
+	text-decoration: none;
+	cursor: pointer;
+}
+.marsad-btn:hover { border-color: var(--m-ink); color: var(--m-ink); }
+.marsad-btn-dark { background: var(--m-ink); border-color: var(--m-ink); color: #fff; }
+.marsad-btn-dark:hover { background: #1f2937; color: #fff; }
+.marsad-btn-primary { background: var(--m-accent); border-color: var(--m-accent); color: #fff; }
+.marsad-btn-primary:hover { background: #1e3a8a; color: #fff; }
+.marsad-btn:focus-visible, .marsad a:focus-visible { outline: 2px solid var(--m-accent); outline-offset: 2px; box-shadow: none; }
 
-.marsad-chartbox { margin-block-start: 16px; }
+.marsad-pill { display: inline-block; font-size: 12px; font-weight: 600; border-radius: 999px; padding: 3px 10px; background: #f1f3f6; color: var(--m-mute); white-space: nowrap; }
+.marsad-pill-ok { background: #e7f5ef; color: var(--m-good); }
+.marsad-pill-bad { background: #fdecec; color: var(--m-bad); }
+.marsad-pill-wait { background: #fdf3e7; color: var(--m-warn); }
+
+.marsad-change { display: inline-block; font-size: 12px; font-weight: 600; border-radius: 999px; padding: 2px 8px; }
+.marsad-change.marsad-good { background: #e7f5ef; }
+.marsad-change.marsad-bad { background: #fdecec; }
+.marsad-change.marsad-flat { background: #f1f3f6; }
+
+/* ── Header and tabs ────────────────────────────────────────────── */
+.marsad-head {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 16px;
+	align-items: center;
+	justify-content: space-between;
+	margin-block: 16px 8px;
+}
+.marsad-brand { display: flex; align-items: center; gap: 14px; }
+.marsad-brand h1 { margin: 0; padding: 0; font-size: 22px; font-weight: 700; line-height: 1.3; }
+.marsad-logo { width: 44px; height: 44px; border-radius: 12px; background: var(--m-ink); color: #fff; display: flex; align-items: center; justify-content: center; }
+.marsad-logo svg { width: 24px; height: 24px; }
+.marsad-actions { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.marsad-actions form { margin: 0; }
+.marsad-ranges { display: inline-flex; padding: 3px; border: 1px solid var(--m-line); border-radius: 10px; background: var(--m-ground); }
+.marsad-ranges a { display: inline-flex; align-items: center; min-height: 34px; padding: 0 14px; border-radius: 8px; text-decoration: none; color: var(--m-mute); font-size: 14px; }
+.marsad-ranges a.is-on { background: var(--m-bg); color: var(--m-ink); font-weight: 600; box-shadow: 0 1px 2px rgba(17, 24, 39, 0.12); }
+
+.marsad-tabs { display: flex; flex-wrap: wrap; gap: 4px; border-block-end: 1px solid var(--m-line); margin-block-end: 20px; }
+.marsad-tabs a { padding: 12px 16px; font-size: 15px; color: var(--m-mute); text-decoration: none; border-block-end: 3px solid transparent; margin-block-end: -1px; }
+.marsad-tabs a:hover { color: var(--m-ink); }
+.marsad-tabs a.is-on { color: var(--m-ink); font-weight: 600; border-block-end-color: var(--m-accent); }
+
+.marsad-titlebar { display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: baseline; justify-content: space-between; margin-block: 8px 16px; }
+.marsad-titlebar h2 { margin: 0; font-size: 24px; font-weight: 700; }
+.marsad-titlebar h3 { margin: 0; font-size: 20px; font-weight: 700; }
+
+/* ── Cards ──────────────────────────────────────────────────────── */
+.marsad-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 16px; margin-block-end: 24px; }
+.marsad-cards-inner { margin-block-end: 0; }
+.marsad-card {
+	flex: 1 1 200px;
+	min-width: 0;
+	background: var(--m-bg);
+	border: 1px solid var(--m-line);
+	border-radius: var(--m-radius);
+	padding: 18px 20px;
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+	color: var(--c, var(--m-accent));
+}
+.marsad-card-off { border-style: dashed; border-color: #b8c0cc; }
+.marsad-card-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; color: var(--m-ink); font-size: 16px; }
+.marsad-label { color: var(--m-mute); font-size: 14px; }
+.marsad-num { color: var(--m-ink); font-size: 32px; font-weight: 700; line-height: 1.1; overflow-wrap: anywhere; }
+.marsad-num-sm { font-size: 22px; text-align: start; }
+.marsad-faint { color: var(--m-faint); }
+.marsad-big { font-size: 24px; font-weight: 700; }
+.marsad-spark { width: 100%; height: 32px; display: block; margin-block-start: 2px; }
+
+/* ── Panels ─────────────────────────────────────────────────────── */
+.marsad-cols { display: flex; flex-wrap: wrap; gap: 24px; margin-block-end: 24px; }
+.marsad-panel {
+	flex: 1 1 340px;
+	min-width: 0;
+	background: var(--m-bg);
+	border: 1px solid var(--m-line);
+	border-radius: var(--m-radius);
+	padding: 22px 24px;
+	display: flex;
+	flex-direction: column;
+	gap: 16px;
+}
+.marsad-panel-wide { flex: 999 1 560px; }
+.marsad-panel-full { flex-basis: 100%; margin-block-end: 24px; }
+.marsad-panel > header { display: flex; flex-wrap: wrap; gap: 8px; align-items: baseline; justify-content: space-between; }
+.marsad-panel h3 { margin: 0; font-size: 18px; font-weight: 700; }
+.marsad-panel header a { font-size: 13px; font-weight: 600; text-decoration: none; }
+.marsad-stack { flex: 1 1 340px; min-width: 0; display: flex; flex-direction: column; gap: 24px; }
+.marsad-stack > .marsad-panel { flex: 0 0 auto; }
+.marsad-subpanel { flex: 1 1 280px; min-width: 0; }
+.marsad-subpanel h4 { margin: 0 0 10px; font-size: 14px; }
+.marsad-panel .marsad-cols { margin-block-end: 0; }
+
+.marsad-callout { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between; padding: 14px 16px; border-radius: 10px; background: #eef3fd; color: #1e3a8a; font-size: 14px; }
+.marsad-skeleton { display: flex; flex-direction: column; gap: 18px; padding-block: 6px; }
+.marsad-skeleton i { display: block; height: 12px; border-radius: 6px; background: var(--m-soft); }
+
+.marsad-banner { display: flex; gap: 12px; align-items: center; padding: 16px 20px; border-radius: var(--m-radius); margin-block-end: 24px; }
+.marsad-banner div { display: flex; flex-direction: column; gap: 2px; }
+.marsad-banner b { font-size: 17px; }
+.marsad-banner span { font-size: 13px; }
+.marsad-banner svg { width: 28px; height: 28px; flex: none; }
+.marsad-banner-ok { background: #e7f5ef; border: 1px solid #b7e2cf; color: #065f46; }
+.marsad-banner-warn { background: #fdf3e7; border: 1px solid #f0d2a8; color: #7c2d12; }
+
+/* ── Daily bars ─────────────────────────────────────────────────── */
+.marsad-bars { display: flex; gap: 12px; }
+.marsad-bars-y { display: flex; flex-direction: column; justify-content: space-between; height: 220px; font-size: 12px; color: var(--m-mute); text-align: end; }
+.marsad-bars-main { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; gap: 8px; }
+.marsad-bars-plot { position: relative; height: 220px; display: flex; align-items: flex-end; gap: 3px; border-block-end: 1px solid #c9cfd8; background: repeating-linear-gradient(to top, transparent 0, transparent calc(25% - 1px), var(--m-soft) calc(25% - 1px), var(--m-soft) 25%); }
+.marsad-bars-plot i { flex: 1 1 0; min-width: 0; background: var(--m-accent); border-radius: 4px 4px 0 0; }
+.marsad-bars-plot i:hover { background: #1e3a8a; }
+.marsad-bars-avg { position: absolute; inset-inline: 0; border-block-start: 1px dashed var(--m-warn); }
+.marsad-bars-x { display: flex; justify-content: space-between; font-size: 12px; color: var(--m-mute); }
+.marsad-legend-line { margin: 0; display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--m-mute); }
+.marsad-key-avg { width: 16px; border-block-start: 1px dashed var(--m-warn); }
+
+/* ── Ranked lists, funnels, stacked bars ────────────────────────── */
+.marsad-rank { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 14px; }
+.marsad-rank li { display: flex; align-items: center; gap: 12px; }
+.marsad-rank li > div { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; gap: 6px; }
+.marsad-rank p { margin: 0; display: flex; justify-content: space-between; gap: 10px; font-size: 14px; }
+.marsad-dim { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+.marsad-dim a { text-decoration: none; }
+.marsad-track { display: block; height: 6px; border-radius: 999px; background: var(--m-soft); overflow: hidden; }
+.marsad-track i { display: block; height: 100%; border-radius: 999px; background: var(--m-accent); }
+.marsad-avatar { flex: 0 0 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; color: #fff; background: var(--c, var(--m-ink)); }
+.marsad-two .marsad-rank { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px 28px; }
+
+.marsad-funnel { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 12px; }
+.marsad-funnel li { display: flex; align-items: center; gap: 14px; font-size: 14px; }
+.marsad-funnel li > span:first-child { flex: 0 0 140px; }
+.marsad-funnel .marsad-track { flex: 1 1 auto; height: 28px; border-radius: 8px; }
+.marsad-funnel .marsad-track i { border-radius: 8px; }
+.marsad-funnel b { flex: 0 0 64px; text-align: end; font-size: 15px; }
+
+.marsad-stacked { display: flex; height: 14px; gap: 2px; border-radius: 999px; overflow: hidden; }
+.marsad-stacked i { flex-basis: 0; min-width: 4px; background: var(--c); }
+
+.marsad-list { margin: 0; padding: 0; list-style: none; }
+.marsad-list li { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 0; border-block-end: 1px solid var(--m-soft); font-size: 14px; }
+.marsad-list li:last-child { border-block-end: 0; }
+.marsad-list li > span { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.marsad-list li > .marsad-pill { display: inline-block; flex: none; }
+.marsad-list small { color: var(--m-mute); font-size: 12px; }
+.marsad-keyed li > span { flex-direction: row; align-items: center; gap: 8px; }
+.marsad-keyed li > span i { width: 10px; height: 10px; border-radius: 3px; background: var(--c); flex: none; }
+
+.marsad-tiles { display: flex; flex-wrap: wrap; gap: 12px; }
+.marsad-tiles > div { flex: 1 1 140px; padding: 14px 16px; border-radius: 10px; background: var(--m-ground); display: flex; flex-direction: column; gap: 6px; }
+.marsad-tiles span { font-size: 13px; color: var(--m-mute); }
+.marsad-tiles b { font-size: 24px; color: var(--m-ink); }
+.marsad-tiles-sm > div { flex-basis: 90px; padding: 10px 12px; }
+.marsad-tiles-sm b { font-size: 20px; color: var(--m-faint); }
+.marsad-card-off .marsad-btn { align-self: flex-start; }
+
+/* Line chart from Marsad_Svg */
+.marsad-chartbox { margin-block-start: 4px; }
 .marsad-chart { width: 100%; height: auto; display: block; direction: ltr; }
-.marsad-grid { stroke: #f1f5f9; }
+.marsad-grid { stroke: var(--m-soft); }
 .marsad-axis { fill: var(--m-mute); font-size: 11px; }
 .marsad-legend { display: flex; flex-wrap: wrap; gap: 14px; margin: 6px 0 0; padding: 0; list-style: none; font-size: 12px; color: var(--m-mute); }
 .marsad-legend li::before { content: ""; display: inline-block; width: 10px; height: 10px; border-radius: 3px; background: var(--c); margin-inline-end: 6px; vertical-align: -1px; }
 
-.marsad-tables { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 14px; margin-block-start: 16px; }
-.marsad-table h3 { margin: 0 0 8px; font-size: 14px; }
-.marsad-table ol { margin: 0; padding: 0; list-style: none; }
-.marsad-table li { position: relative; display: flex; justify-content: space-between; gap: 10px; padding: 5px 8px; border-radius: 6px; font-size: 13px; overflow: hidden; }
-.marsad-table li i { position: absolute; inset-block: 0; inset-inline-start: 0; background: #eff6ff; z-index: 0; border-radius: 6px; }
-.marsad-table li > span, .marsad-table li > b { position: relative; z-index: 1; }
-.marsad-dim { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
-.marsad-table b { font-variant-numeric: tabular-nums; }
-
-.marsad-empty { background: #f0f6fc; border: 1px dashed #72aee6; border-radius: var(--m-radius); padding: 18px 20px; margin-block-end: 18px; }
-.marsad-empty h2 { margin-block-start: 0; }
-
-/* Connections */
+/* ── Connections ────────────────────────────────────────────────── */
+.marsad-top { display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-end; justify-content: space-between; margin-block: 12px 18px; }
+.marsad h1 { margin-block-end: 2px; }
 .marsad-group { margin-block: 22px 8px; }
 .marsad-conns { display: grid; gap: 10px; }
 .marsad-conn { background: var(--m-bg); border: 1px solid var(--m-line); border-inline-start: 4px solid #c3c4c7; border-radius: 10px; padding: 0 16px; }
@@ -111,12 +215,13 @@
 .marsad-conn summary { cursor: pointer; padding: 12px 0; display: flex; gap: 10px; align-items: center; list-style: none; }
 .marsad-conn summary::-webkit-details-marker { display: none; }
 .marsad-conn summary b { font-size: 15px; }
-.marsad-pill { font-size: 12px; border-radius: 999px; padding: 2px 10px; background: #f0f0f1; color: var(--m-mute); }
 .marsad-s-ok { border-inline-start-color: #16a34a; }
-.marsad-s-ok .marsad-pill { background: #dcfce7; color: var(--m-good); }
+.marsad-s-ok .marsad-pill { background: #e7f5ef; color: var(--m-good); }
 .marsad-s-bad { border-inline-start-color: #dc2626; }
-.marsad-s-bad .marsad-pill { background: #fee2e2; color: var(--m-bad); }
+.marsad-s-bad .marsad-pill { background: #fdecec; color: var(--m-bad); }
 .marsad-s-wait { border-inline-start-color: #d97706; }
+.marsad-add { border-style: dashed; border-inline-start: 1px dashed #8c96a3; }
+.marsad-add summary b { color: var(--m-accent); }
 .marsad-steps { margin-inline-start: 18px; color: var(--m-mute); }
 .marsad-req { color: var(--m-bad); }
 .marsad-row { display: flex; flex-wrap: wrap; gap: 16px; align-items: center; }
@@ -124,7 +229,10 @@
 .marsad-forget label { color: var(--m-mute); font-size: 12px; }
 .marsad-copy { cursor: copy; user-select: all; }
 
-@media (max-width: 600px) {
-	.marsad-hl b { font-size: 22px; }
-	.marsad-tables { grid-template-columns: 1fr; }
+@media (max-width: 782px) {
+	.marsad-num { font-size: 26px; }
+	.marsad-two .marsad-rank { grid-template-columns: 1fr; }
+	.marsad-funnel li > span:first-child { flex-basis: 96px; }
+	.marsad-bars-y, .marsad-bars-plot { height: 160px; }
+	.marsad-panel { padding: 18px; }
 }

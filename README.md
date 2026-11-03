@@ -23,6 +23,7 @@ Later releases appear in **Dashboard → Updates** like any other plugin. To tur
 | Source | What it records | What you need |
 |---|---|---|
 | WordPress | Posts and comments per day; posts by author and category | Nothing. Always on. |
+| Site & hosting | Totals of posts, pages, images, videos, comments and users by role; database and uploads size; home page response time; software versions and scheduled-task health | Nothing. Always on. |
 | Google Analytics 4 | Users, new users, sessions, views, engagement; top pages, platforms, channels, sources, countries, devices | GA4 property ID and a Google service-account JSON key with **Viewer** on the property |
 | Search Console | Clicks, impressions, CTR, position; top queries and pages | Property (`https://example.com/` or `sc-domain:example.com`) and a service account added as a user |
 | YouTube | Subscribers, total views, videos; views of recent uploads | Channel ID and a YouTube Data API key |
@@ -41,7 +42,7 @@ Secrets are encrypted at rest (AES-256-GCM, keyed from your `wp-config.php` salt
 
 - WP-Cron runs a sync hourly (configurable). The first sync of a source imports up to 90 days of history (configurable, capped per source); later syncs refresh the last few days, because most platforms revise recent numbers.
 - Data lives in one table, `{prefix}marsad_metrics`, one row per source, metric, dimension and day. Old rows are purged after the retention period (default 730 days).
-- The dashboard compares each period with the one before it. Charts are server-rendered SVG, so the page loads no external scripts.
+- The dashboard has four tabs: **Overview**, **Content & users**, **Platforms & apps** and **Hosting**. It compares each period with the one before it. Charts are server-rendered SVG, so the page loads no external scripts.
 - Who can see the dashboard is set under **Marsad → Settings**. Only administrators can manage connections.
 
 ## For developers

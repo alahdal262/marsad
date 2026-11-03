@@ -6,6 +6,13 @@
 
 require __DIR__ . '/bootstrap.php';
 
+// A warning or notice in plugin code is a bug: fail the test that triggered it.
+set_error_handler(
+	function ( $no, $msg, $file, $line ) {
+		throw new ErrorException( $msg . ' at ' . basename( $file ) . ':' . $line, 0, $no, $file, $line );
+	}
+);
+
 function check( $cond, $msg = 'assertion failed' ) {
 	if ( ! $cond ) {
 		throw new Exception( $msg );
