@@ -100,6 +100,9 @@ class Marsad_Admin {
 		if ( ! empty( $_POST['enabled'] ) && $c->is_configured() ) {
 			$st = Marsad_Sync::run( $c );
 			self::notice( $st['ok'] ? 'success' : 'error', $c->label() . ': ' . ( $st['ok'] ? __( 'saved and synced.', 'marsad' ) . ' ' . $st['message'] : $st['message'] ) );
+		} elseif ( ! empty( $_POST['enabled'] ) ) {
+			/* translators: %s: comma-separated list of what is still needed */
+			self::notice( 'warning', $c->label() . ': ' . sprintf( __( 'saved, but it cannot sync yet. Still missing: %s.', 'marsad' ), implode( '، ', $c->missing() ) ) );
 		} else {
 			self::notice( 'success', $c->label() . ': ' . __( 'saved.', 'marsad' ) );
 		}

@@ -5,6 +5,11 @@ return array(
 	'plural-forms' => 'nplurals=6; plural=(n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 ? 4 : 5);',
 	'language' => 'ar',
 	'messages' => array(
+		'Missing: %s' => 'ينقصه: %s',
+		'saved, but it cannot sync yet. Still missing: %s.' => 'حُفظ، لكنه لا يستطيع المزامنة بعد. ما زال ينقصه: %s.',
+		'Connect with Google (or a service account key)' => 'ربط حساب جوجل (أو مفتاح حساب خدمة)',
+		'Connect with Google (or an API key and channel ID)' => 'ربط حساب جوجل (أو مفتاح API ومعرّف القناة)',
+		'Connect Facebook first (or an access token)' => 'ربط فيسبوك أولاً (أو رمز وصول)',
 		'Pick it from the list after connecting Google, or type sc-domain:example.com / https://example.com/.' => 'اختره من القائمة بعد ربط جوجل، أو اكتب ‎sc-domain:example.com أو ‎https://example.com/',
 		'Only if you prefer a service account to "Connect with Google".' => 'فقط إن كنت تفضّل حساب خدمة بدل «اربط بحساب جوجل».',
 		'Press "Connect with Google" at the top of this page with an account that has access to the site in Search Console.' => 'اضغط «اربط بحساب جوجل» أعلى هذه الصفحة بحساب له صلاحية على الموقع في Search Console.',

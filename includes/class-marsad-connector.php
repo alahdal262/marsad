@@ -104,13 +104,37 @@ abstract class Marsad_Connector {
 		return '' !== trim( (string) $this->get( 'service_account' ) ) || Marsad_Google_Account::connected();
 	}
 
-	public function is_configured() {
-		foreach ( $this->fields() as $key => $f ) {
-			if ( ! empty( $f['required'] ) && '' === trim( (string) $this->get( $key ) ) ) {
-				return false;
+	/**
+	 * What the admin still has to provide, in words they can act on. Empty when ready.
+	 *
+	 * @return string[]
+	 */
+	public function missing() {
+		return self::missing_fields( $this );
+	}
+
+	/** For Google sources: the required fields, plus an account or key to read them with. */
+	protected function missing_google() {
+		$out = Marsad_Connector::missing_fields( $this );
+		if ( ! $this->has_google_auth() ) {
+			$out[] = __( 'Connect with Google (or a service account key)', 'marsad' );
+		}
+		return $out;
+	}
+
+	/** The base rule, callable from overrides that add their own. */
+	public static function missing_fields( Marsad_Connector $c ) {
+		$out = array();
+		foreach ( $c->fields() as $key => $f ) {
+			if ( ! empty( $f['required'] ) && '' === trim( (string) $c->get( $key ) ) ) {
+				$out[] = $f['label'];
 			}
 		}
-		return true;
+		return $out;
+	}
+
+	public function is_configured() {
+		return ! $this->missing();
 	}
 
 	/**

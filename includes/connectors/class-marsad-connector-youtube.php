@@ -43,11 +43,11 @@ class Marsad_Connector_Youtube extends Marsad_Connector {
 		);
 	}
 
-	public function is_configured() {
+	public function missing() {
 		if ( '' !== trim( (string) $this->get( 'api_key' ) ) ) {
-			return '' !== trim( (string) $this->get( 'channel_id' ) );
+			return '' === trim( (string) $this->get( 'channel_id' ) ) ? array( __( 'Channel', 'marsad' ) ) : array();
 		}
-		return Marsad_Google_Account::connected();
+		return Marsad_Google_Account::connected() ? array() : array( __( 'Connect with Google (or an API key and channel ID)', 'marsad' ) );
 	}
 
 	public function choices( $key ) {

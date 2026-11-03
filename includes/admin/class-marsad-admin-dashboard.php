@@ -639,6 +639,11 @@ class Marsad_Admin_Dashboard {
 	/** @return array( state, label ) for a source's pill */
 	private static function state( Marsad_Connector $c, array $st ) {
 		if ( ! Marsad_Registry::is_enabled( $c ) ) {
+			$saved = Marsad_Registry::saved();
+			if ( ! empty( $saved[ $c->id() ]['enabled'] ) && $c->missing() ) {
+				/* translators: %s: comma-separated list of what is still needed */
+				return array( 'wait', sprintf( __( 'Missing: %s', 'marsad' ), implode( '، ', $c->missing() ) ) );
+			}
 			return array( 'off', __( 'Not connected', 'marsad' ) );
 		}
 		if ( ! $st ) {

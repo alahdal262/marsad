@@ -63,9 +63,10 @@ class Marsad_Connector_Instagram extends Marsad_Connector {
 	}
 
 	// Runs on every page view, so it must not call Facebook: a token is enough, fetch() finds the account.
-	public function is_configured() {
+	public function missing() {
 		$fb = Marsad_Registry::get( 'facebook' );
-		return '' !== trim( (string) $this->get( 'token' ) ) || ( $fb && '' !== trim( (string) $fb->get( 'token' ) ) );
+		$ok = '' !== trim( (string) $this->get( 'token' ) ) || ( $fb && '' !== trim( (string) $fb->get( 'token' ) ) );
+		return $ok ? array() : array( __( 'Connect Facebook first (or an access token)', 'marsad' ) );
 	}
 
 	public function choices( $key ) {

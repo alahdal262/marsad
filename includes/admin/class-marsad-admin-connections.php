@@ -102,7 +102,12 @@ class Marsad_Admin_Connections {
 		$enabled = $c->always_on() || ! empty( $saved[ $c->id() ]['enabled'] );
 		$state   = 'off';
 		$label   = __( 'Not connected', 'marsad' );
-		if ( $enabled && $c->is_configured() ) {
+		$missing = $c->missing();
+		if ( $enabled && $missing ) {
+			$state = 'wait';
+			/* translators: %s: comma-separated list of what is still needed */
+			$label = sprintf( __( 'Missing: %s', 'marsad' ), implode( '، ', $missing ) );
+		} elseif ( $enabled ) {
 			if ( ! $st ) {
 				$state = 'wait';
 				$label = __( 'Waiting for first sync', 'marsad' );

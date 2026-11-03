@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.4.1
+
+- Each source now says exactly what it still needs ("Missing: Bot token", "Missing: Connect with Google …") on its card, on the dashboard and right after saving, instead of a plain "Not connected".
+
 ## 0.4.0
 
 - **Connect with Google**: one sign-in for Analytics, Search Console, YouTube and Google Play, through the Marsad Connect relay. Properties, sites and channels are picked from lists instead of typed.

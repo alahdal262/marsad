@@ -34,8 +34,8 @@ class Marsad_Connector_Google_Play extends Marsad_Connector {
 		);
 	}
 
-	public function is_configured() {
-		return parent::is_configured() && $this->has_google_auth();
+	public function missing() {
+		return $this->missing_google();
 	}
 
 	public function instructions() {
