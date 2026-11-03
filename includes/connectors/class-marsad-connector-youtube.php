@@ -31,23 +31,37 @@ class Marsad_Connector_Youtube extends Marsad_Connector {
 
 	public function fields() {
 		return array(
-			'channel_id' => array( 'label' => __( 'Channel', 'marsad' ), 'type' => 'text', 'help' => __( 'Pick it after connecting Google (empty = your own channel), or type an ID starting with UC….', 'marsad' ) ),
-			'api_key'    => array( 'label' => __( 'API key', 'marsad' ), 'type' => 'secret', 'advanced' => true, 'help' => __( 'Only without "Connect with Google": a YouTube Data API v3 key; then the channel ID is required.', 'marsad' ) ),
+			'channel_id' => array( 'label' => __( 'Channel link', 'marsad' ), 'type' => 'text', 'help' => __( 'Paste the channel address or @handle, for example youtube.com/@yourchannel. Any public channel works, even one you do not manage.', 'marsad' ) ),
+			'api_key'    => array( 'label' => __( 'API key', 'marsad' ), 'type' => 'secret', 'advanced' => true, 'help' => __( 'Optional: your own YouTube Data API v3 key, so you do not share Marsad\'s daily quota.', 'marsad' ), 'url' => 'https://console.cloud.google.com/apis/credentials', 'link' => __( 'Create an API key', 'marsad' ) ),
 		);
 	}
 
 	public function instructions() {
 		return array(
-			__( 'Press "Connect with Google" at the top of this page with the account that owns or manages the channel.', 'marsad' ),
-			__( 'Pick the channel below (or leave it empty for your own) and save.', 'marsad' ),
+			__( 'Paste the channel link below and save: subscribers, views and videos are public, so nothing else is needed.', 'marsad' ),
+			__( 'Manage the channel? Press "Connect with Google" instead and pick it from the list.', 'marsad' ),
 		);
 	}
 
 	public function missing() {
-		if ( '' !== trim( (string) $this->get( 'api_key' ) ) ) {
-			return '' === trim( (string) $this->get( 'channel_id' ) ) ? array( __( 'Channel', 'marsad' ) ) : array();
+		// With the Google account an empty channel means "my own"; otherwise a link is needed.
+		$have = self::channel_query( (string) $this->get( 'channel_id' ) ) || ( Marsad_Google_Account::connected() && '' === trim( (string) $this->get( 'api_key' ) ) );
+		return $have ? array() : array( __( 'Channel link', 'marsad' ) );
+	}
+
+	/**
+	 * What to ask YouTube for, from whatever the admin pasted: a channel URL, an @handle
+	 * or a UC… id. Public for tests.
+	 */
+	public static function channel_query( $input ) {
+		$s = trim( (string) $input );
+		if ( preg_match( '~(?:^|/channel/)(UC[A-Za-z0-9_-]{22})(?:[/?#]|$)~', $s, $m ) ) {
+			return array( 'id' => $m[1] );
 		}
-		return Marsad_Google_Account::connected() ? array() : array( __( 'Connect with Google (or an API key and channel ID)', 'marsad' ) );
+		if ( preg_match( '~(?:^|/)(@[A-Za-z0-9._-]{3,100})(?:[/?#]|$)~', $s, $m ) ) {
+			return array( 'forHandle' => $m[1] );
+		}
+		return array();
 	}
 
 	public function choices( $key ) {
@@ -63,21 +77,20 @@ class Marsad_Connector_Youtube extends Marsad_Connector {
 	}
 
 	/**
-	 * Query args and headers for one call: the API key when one is set, otherwise the Google account.
+	 * One read: with the site's own API key, as the connected Google account, or through
+	 * Marsad Connect's shared key (public numbers only, nothing to set up).
 	 *
 	 * @throws Marsad_Exception
 	 */
-	private function auth( array $args ) {
+	private function call( $endpoint, array $args ) {
 		$key = trim( (string) $this->get( 'api_key' ) );
 		if ( '' !== $key ) {
-			return array( $args + array( 'key' => $key ), array() );
+			return Marsad_Http::json( 'GET', self::API . $endpoint . '?' . http_build_query( $args + array( 'key' => $key ) ) );
 		}
-		return array( $args, array( 'Authorization' => 'Bearer ' . Marsad_Google_Account::token() ) );
-	}
-
-	private function call( $endpoint, array $args ) {
-		list( $q, $headers ) = $this->auth( $args );
-		return Marsad_Http::json( 'GET', self::API . $endpoint . '?' . http_build_query( $q ), null, $headers );
+		if ( Marsad_Google_Account::connected() ) {
+			return Marsad_Http::json( 'GET', self::API . $endpoint . '?' . http_build_query( $args ), null, array( 'Authorization' => 'Bearer ' . Marsad_Google_Account::token() ) );
+		}
+		return Marsad_Http::json( 'GET', Marsad_Google_Account::relay() . 'youtube.php?' . http_build_query( array( 'endpoint' => $endpoint ) + $args ) );
 	}
 
 	public function metrics() {
@@ -95,10 +108,10 @@ class Marsad_Connector_Youtube extends Marsad_Connector {
 	}
 
 	public function fetch( $from, $to ) {
-		$channel = trim( (string) $this->get( 'channel_id' ) );
-		$ch      = $this->call( 'channels', array( 'part' => 'statistics,contentDetails' ) + ( '' !== $channel ? array( 'id' => $channel ) : array( 'mine' => 'true' ) ) );
+		$which = self::channel_query( (string) $this->get( 'channel_id' ) );
+		$ch    = $this->call( 'channels', array( 'part' => 'statistics,contentDetails' ) + ( $which ? $which : array( 'mine' => 'true' ) ) );
 		if ( empty( $ch['items'][0] ) ) {
-			throw new Marsad_Exception( __( 'No channel with this ID.', 'marsad' ) );
+			throw new Marsad_Exception( __( 'YouTube found no channel at this link. Copy the address from the channel page and paste it again.', 'marsad' ) );
 		}
 		$day  = $this->today();
 		$st   = $ch['items'][0]['statistics'];

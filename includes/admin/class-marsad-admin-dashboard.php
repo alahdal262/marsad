@@ -45,8 +45,8 @@ class Marsad_Admin_Dashboard {
 		echo '<div class="marsad-actions"><nav class="marsad-ranges" aria-label="' . esc_attr__( 'Period', 'marsad' ) . '">';
 		foreach ( Marsad_Report::RANGES as $r ) {
 			/* translators: %d: number of days */
-			$label = 365 === $r ? __( 'Year', 'marsad' ) : sprintf( __( '%d days', 'marsad' ), $r );
-			$on    = $report->length() === $r;
+			$label = 0 === $r ? __( 'All time', 'marsad' ) : ( 365 === $r ? __( 'Year', 'marsad' ) : sprintf( __( '%d days', 'marsad' ), $r ) );
+			$on    = $report->key() === $r;
 			echo '<a class="' . ( $on ? 'is-on' : '' ) . '"' . ( $on ? ' aria-current="true"' : '' ) . ' href="' . esc_url( Marsad_Admin::url( '', array( 'range' => $r, 'tab' => $tab ) ) ) . '">' . esc_html( $label ) . '</a>';
 		}
 		echo '</nav>';
@@ -60,7 +60,7 @@ class Marsad_Admin_Dashboard {
 		echo '<nav class="marsad-tabs" aria-label="' . esc_attr__( 'Dashboard sections', 'marsad' ) . '">';
 		foreach ( self::tabs() as $key => $label ) {
 			$on = $key === $tab;
-			echo '<a href="' . esc_url( Marsad_Admin::url( '', array( 'tab' => $key, 'range' => $report->length() ) ) ) . '"' . ( $on ? ' class="is-on" aria-current="page"' : '' ) . '>' . esc_html( $label ) . '</a>';
+			echo '<a href="' . esc_url( Marsad_Admin::url( '', array( 'tab' => $key, 'range' => $report->key() ) ) ) . '"' . ( $on ? ' class="is-on" aria-current="page"' : '' ) . '>' . esc_html( $label ) . '</a>';
 		}
 		echo '</nav>';
 		Marsad_Admin::print_notice();
@@ -69,7 +69,7 @@ class Marsad_Admin_Dashboard {
 		echo esc_html(
 			sprintf(
 				/* translators: 1: start date, 2: end date, 3: e.g. "5 minutes ago" */
-				__( '%1$s – %2$s, compared with the period before · synced %3$s', 'marsad' ),
+				$report->all ? __( '%1$s – %2$s, everything recorded · synced %3$s', 'marsad' ) : __( '%1$s – %2$s, compared with the period before · synced %3$s', 'marsad' ),
 				date_i18n( get_option( 'date_format' ), strtotime( $report->range['from'] . ' 12:00 UTC' ) ),
 				date_i18n( get_option( 'date_format' ), strtotime( $report->range['to'] . ' 12:00 UTC' ) ),
 				Marsad_Admin::ago( $last )
@@ -212,6 +212,26 @@ class Marsad_Admin_Dashboard {
 		echo '</div></div>';
 
 		echo '<div class="marsad-cols">';
+		self::panel_open( __( 'Posts by status', 'marsad' ), __( 'Right now, including drafts and the trash', 'marsad' ) );
+		$status_parts = array();
+		foreach ( array( 'posts_total' => __( 'Published', 'marsad' ), 'posts_draft' => $defs['posts_draft']['label'], 'posts_pending' => $defs['posts_pending']['label'], 'posts_future' => $defs['posts_future']['label'], 'posts_private' => $defs['posts_private']['label'], 'posts_trash' => $defs['posts_trash']['label'] ) as $k => $label ) {
+			$status_parts[] = array( $label, self::metric( 'site', $k )['value'] ?? null );
+		}
+		self::stacked( $status_parts, array( '#047857', '#1d4ed8', '#b45309', '#7c3aed', '#5b6472', '#b91c1c' ) );
+		self::panel_close();
+
+		self::panel_open( __( 'Deleted posts', 'marsad' ), __( 'In the selected period', 'marsad' ) );
+		$trashed = self::metric( 'wordpress', 'posts_trashed' );
+		$gone    = self::metric( 'wordpress', 'posts_deleted' );
+		echo '<ul class="marsad-list">';
+		echo '<li><span>' . esc_html__( 'Moved to the trash', 'marsad' ) . '</span><b>' . esc_html( Marsad_Admin::format( $trashed['value'] ?? 0 ) ) . '</b></li>';
+		echo '<li><span>' . esc_html__( 'Deleted permanently', 'marsad' ) . '<small>' . esc_html__( 'Counted from the day Marsad was installed: WordPress keeps no record of older ones.', 'marsad' ) . '</small></span><b>' . esc_html( Marsad_Admin::format( $gone['value'] ?? 0 ) ) . '</b></li>';
+		echo '<li><span>' . esc_html__( 'In the trash now', 'marsad' ) . '</span><b>' . esc_html( Marsad_Admin::format( self::metric( 'site', 'posts_trash' )['value'] ?? null ) ) . '</b></li>';
+		echo '</ul>';
+		self::panel_close();
+		echo '</div>';
+
+		echo '<div class="marsad-cols">';
 		self::panel_open( __( 'Posts by category', 'marsad' ), '', 'wide' );
 		echo '<div class="marsad-two">';
 		self::ranked( $report->table( 'wordpress', 'posts_by_category', array( 'agg' => 'sum', 'limit' => 12 ) ) );
@@ -324,7 +344,7 @@ class Marsad_Admin_Dashboard {
 		$latest = self::enabled( 'site' ) ? $report->metric( 'site', 'response_ms', array( 'agg' => 'last' ) )['value'] : null;
 		self::panel_open( __( 'Home page response time', 'marsad' ), __( 'Milliseconds, measured from this server on each sync', 'marsad' ), 'wide', '<b class="marsad-big">' . esc_html( Marsad_Admin::format( $latest ) ) . '</b>' );
 		if ( $resp && null !== $resp['value'] ) {
-			self::bars( array_map( function ( $v ) { return null === $v ? 0 : $v; }, $resp['series'] ), $report->days, __( 'ms', 'marsad' ) );
+			self::bars( array_map( function ( $v ) { return null === $v ? 0 : $v; }, $resp['series'] ), $report->days, __( 'ms', 'marsad' ), 'avg' );
 		} elseif ( null !== $latest ) {
 			self::callout( __( 'The daily chart starts tomorrow, after the first full day of measurements.', 'marsad' ) );
 		} else {
@@ -421,7 +441,21 @@ class Marsad_Admin_Dashboard {
 	/**
 	 * Daily columns with an average line. Oldest first in the markup, so RTL reads right to left.
 	 */
-	private static function bars( array $values, array $days, $unit ) {
+	private static function bars( array $values, array $days, $unit, $agg = 'sum' ) {
+		$monthly = count( $values ) > 120;
+		if ( $monthly ) {
+			// Long periods read better as one column per month.
+			$buckets = array();
+			foreach ( $values as $i => $v ) {
+				$buckets[ substr( $days[ $i ], 0, 7 ) ][] = (float) $v;
+			}
+			$values = array();
+			$days   = array();
+			foreach ( $buckets as $ym => $vs ) {
+				$values[] = 'avg' === $agg ? array_sum( $vs ) / count( $vs ) : array_sum( $vs );
+				$days[]   = $ym . '-01';
+			}
+		}
 		$count = count( $values );
 		if ( ! $count ) {
 			return;
@@ -445,6 +479,7 @@ class Marsad_Admin_Dashboard {
 		if ( $top > 0 ) {
 			echo '<span class="marsad-bars-avg" style="bottom:' . esc_attr( round( $avg / $top * 100, 2 ) ) . '%"></span>';
 		}
+		$fmt = $monthly ? 'F Y' : $fmt;
 		foreach ( $values as $i => $v ) {
 			$h   = $top > 0 ? round( $v / $top * 100, 2 ) : 0;
 			$day = isset( $days[ $i ] ) ? date_i18n( $fmt, strtotime( $days[ $i ] . ' 12:00 UTC' ) ) : '';
@@ -453,11 +488,12 @@ class Marsad_Admin_Dashboard {
 		echo '</div><div class="marsad-bars-x" aria-hidden="true">';
 		$marks = array_unique( array( 0, (int) floor( ( $count - 1 ) / 2 ), $count - 1 ) );
 		foreach ( $marks as $i ) {
-			echo '<span>' . esc_html( isset( $days[ $i ] ) ? date_i18n( 'j M', strtotime( $days[ $i ] . ' 12:00 UTC' ) ) : '' ) . '</span>';
+			echo '<span>' . esc_html( isset( $days[ $i ] ) ? date_i18n( $monthly ? 'M Y' : 'j M', strtotime( $days[ $i ] . ' 12:00 UTC' ) ) : '' ) . '</span>';
 		}
 		echo '</div></div></div>';
 		/* translators: 1: average value, 2: unit such as "posts" */
-		echo '<p class="marsad-legend-line"><span class="marsad-key-avg"></span>' . esc_html( sprintf( __( 'Average %1$s %2$s a day', 'marsad' ), number_format_i18n( $avg, 1 ), $unit ) ) . '</p>';
+		$line = $monthly ? __( 'Average %1$s %2$s a month', 'marsad' ) : __( 'Average %1$s %2$s a day', 'marsad' );
+		echo '<p class="marsad-legend-line"><span class="marsad-key-avg"></span>' . esc_html( sprintf( $line, number_format_i18n( $avg, 1 ), $unit ) ) . '</p>';
 	}
 
 	/** Round up to 1, 2, 4, 6 or 8 times a power of ten, so the quarter-way axis labels are tidy. */
@@ -653,7 +689,7 @@ class Marsad_Admin_Dashboard {
 	}
 
 	private static function tab_link( $tab, $label ) {
-		return '<a href="' . esc_url( Marsad_Admin::url( '', array( 'tab' => $tab, 'range' => self::$report->length() ) ) ) . '">' . esc_html( $label ) . '</a>';
+		return '<a href="' . esc_url( Marsad_Admin::url( '', array( 'tab' => $tab, 'range' => self::$report->key() ) ) ) . '">' . esc_html( $label ) . '</a>';
 	}
 
 	/** Megabytes as a readable size. */

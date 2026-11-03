@@ -42,9 +42,9 @@ class Marsad_Connector_Facebook extends Marsad_Connector {
 
 	public function instructions() {
 		return array(
-			__( 'Open developers.facebook.com/tools/explorer (create a free app the first time if asked).', 'marsad' ),
+			$this->step( __( 'Open Graph API Explorer (create a free app the first time if asked).', 'marsad' ), 'https://developers.facebook.com/tools/explorer/', __( 'Graph API Explorer', 'marsad' ) ),
 			__( 'Under Permissions add pages_show_list, pages_read_engagement and instagram_basic, then press "Generate Access Token" and allow your Page.', 'marsad' ),
-			__( 'Copy the token into developers.facebook.com/tools/debug/accesstoken, press "Debug", then "Extend Access Token", and copy the long token it shows.', 'marsad' ),
+			$this->step( __( 'Paste that token in the Access Token Debugger, press "Debug", then "Extend Access Token", and copy the long token it shows.', 'marsad' ), 'https://developers.facebook.com/tools/debug/accesstoken/', __( 'Access Token Debugger', 'marsad' ) ),
 			__( 'Paste it here and save, then pick your Page from the list.', 'marsad' ),
 		);
 	}

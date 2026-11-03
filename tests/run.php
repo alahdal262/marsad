@@ -44,7 +44,7 @@ function throws( callable $fn, $contains = '' ) {
 }
 
 foreach ( glob( __DIR__ . '/test-*.php' ) as $file ) {
-	require $file;
+	require_once $file;
 }
 
 $pass = 0;

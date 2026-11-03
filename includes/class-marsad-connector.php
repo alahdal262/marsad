@@ -81,12 +81,32 @@ abstract class Marsad_Connector {
 		return false;
 	}
 
+	/**
+	 * Local sources that can rebuild every day since the beginning (the site's own posts)
+	 * import all of it, and their rows are never removed by the retention setting.
+	 */
+	public function full_history() {
+		return false;
+	}
+
+	/** First day worth importing for a full-history source (Y-m-d). */
+	public function history_start() {
+		return gmdate( 'Y-m-d', time() - 365 * DAY_IN_SECONDS );
+	}
+
 	public function set_values( array $values ) {
 		$this->values = $values;
 	}
 
 	public function get( $key, $default = '' ) {
 		return isset( $this->values[ $key ] ) && '' !== $this->values[ $key ] ? $this->values[ $key ] : $default;
+	}
+
+	/**
+	 * One setup step with a button that opens the exact page it talks about.
+	 */
+	protected function step( $text, $url = '', $link = '' ) {
+		return array( 'text' => $text, 'url' => $url, 'link' => '' !== $link ? $link : __( 'Open', 'marsad' ) );
 	}
 
 	/**

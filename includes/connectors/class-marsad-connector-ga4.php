@@ -30,14 +30,14 @@ class Marsad_Connector_Ga4 extends Marsad_Connector {
 	public function fields() {
 		return array(
 			'property_id'     => array( 'label' => __( 'Analytics property', 'marsad' ), 'type' => 'text', 'required' => true, 'help' => __( 'Pick it from the list after connecting Google, or type the property ID (digits only, Admin → Property settings).', 'marsad' ) ),
-			'service_account' => array( 'label' => __( 'Service account key (JSON)', 'marsad' ), 'type' => 'textarea_secret', 'advanced' => true, 'help' => __( 'Only if you prefer a service account to "Connect with Google".', 'marsad' ) ),
+			'service_account' => array( 'label' => __( 'Service account key (JSON)', 'marsad' ), 'type' => 'textarea_secret', 'advanced' => true, 'help' => __( 'Only if you prefer a service account to "Connect with Google": create one, add a JSON key, and give its e-mail read access in the product.', 'marsad' ), 'url' => 'https://console.cloud.google.com/iam-admin/serviceaccounts', 'link' => __( 'Service accounts', 'marsad' ) ),
 		);
 	}
 
 	public function instructions() {
 		return array(
 			__( 'Press "Connect with Google" at the top of this page and sign in with an account that can see your Analytics.', 'marsad' ),
-			__( 'Pick the property below and save.', 'marsad' ),
+			$this->step( __( 'Pick the property below and save. No property yet? Create one in Google Analytics.', 'marsad' ), 'https://analytics.google.com/analytics/web/', __( 'Google Analytics', 'marsad' ) ),
 		);
 	}
 

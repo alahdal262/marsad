@@ -22,13 +22,13 @@ Later releases appear in **Dashboard → Updates** like any other plugin. To tur
 
 | Source | What it records | What you need |
 |---|---|---|
-| WordPress | Posts and comments per day; posts by author and category | Nothing. Always on. |
+| WordPress | Posts per day since the very first post (posts later deleted included), comments, posts moved to the trash, posts deleted permanently (from install on); posts by author and category | Nothing. Always on. |
 | Site & hosting | Totals of posts, pages, images, videos, comments and users by role; database and uploads size; home page response time; software versions and scheduled-task health | Nothing. Always on. |
 | Google Analytics 4 | Users, new users, sessions, views, engagement; top pages, platforms, channels, sources, countries, devices | **Connect with Google**, then pick the property (advanced: a service-account key) |
 | Search Console | Clicks, impressions, CTR, position; top queries and pages | **Connect with Google**, then pick the site (advanced: a service-account key) |
-| YouTube | Subscribers, total views, videos; views of recent uploads | **Connect with Google** (your own channel, or pick one) — advanced: an API key and channel ID |
+| YouTube | Subscribers, total views, videos; views of recent uploads | Paste the channel link. Any public channel works, no key needed (advanced: your own API key, or Connect with Google for your own channel) |
 | Facebook Page | Followers, fans, people talking about the page | Paste one token from Facebook's token tools, pick the Page; Marsad keeps the Page's never-expiring token |
-| Instagram | Followers, posts | Nothing more: found through the Facebook Page it is linked to |
+| Instagram | Followers, posts | Nothing more: found through the Facebook Page. Advanced: follow any public business/creator account by username |
 | Telegram | Channel or group members | Bot token (the bot must be in the channel) and `@channel` or chat ID |
 | Google Play | Daily installs, uninstalls, active devices, total users | **Connect with Google** with an account that can download Play reports, plus the package name and reports bucket |
 | App Store | Downloads, re-downloads, updates; downloads by country | App Store Connect API key (Issuer ID, Key ID, `.p8`) with Sales access, vendor number; optional Apple ID to filter one app |
@@ -46,8 +46,15 @@ Secrets are encrypted at rest (AES-256-GCM, keyed from your `wp-config.php` salt
 
 - WP-Cron runs a sync hourly (configurable). The first sync of a source imports up to 90 days of history (configurable, capped per source); later syncs refresh the last few days, because most platforms revise recent numbers.
 - Data lives in one table, `{prefix}marsad_metrics`, one row per source, metric, dimension and day. Old rows are purged after the retention period (default 730 days).
+- Every setup step links straight to the page where you get what it asks for.
 - The dashboard has four tabs: **Overview**, **Content & users**, **Platforms & apps** and **Hosting**. It compares each period with the one before it. Charts are server-rendered SVG, so the page loads no external scripts.
 - Who can see the dashboard is set under **Marsad → Settings**. Only administrators can manage connections.
+
+## Languages
+
+Marsad follows each admin's own WordPress language (their profile language, else the site's): Arabic, English, French, Spanish, German, Italian, Portuguese, Russian, Turkish, Persian, Urdu, Hindi, Indonesian, Chinese and Japanese. Regional variants use their language's file (fr_CA reads French).
+
+To add or fix a language: `php bin/l10n-catalog.php . > catalog.json`, translate it into `{"singles": {english: text}, "plurals": [[forms…]]}`, then `php bin/l10n-build.php catalog.json tr-xx.json xx`. The build refuses missing strings and changed placeholders.
 
 ## For developers
 
@@ -142,13 +149,17 @@ GPL-2.0-or-later. See [LICENSE](LICENSE).
 ### الربط
 
 - **مصادر Google** (التحليلات، Search Console، Google Play): أنشئ حساب خدمة في Google Cloud ومفتاح JSON له، وفعّل الواجهة البرمجية المذكورة في بطاقة الاتصال، ثم أضف بريد حساب الخدمة مستخدماً في المنتج نفسه. صفحة الاتصالات تعرض هذا البريد بعد حفظ المفتاح، وتحوّل رسالة «الواجهة غير مفعّلة» إلى الخطوة المطلوبة بالضبط.
-- **يوتيوب**: معرّف القناة ومفتاح YouTube Data API.
+- **يوتيوب**: الصق رابط القناة فقط، وتصلح أي قناة عامة دون مفتاح.
 - **فيسبوك وإنستغرام**: معرّف الصفحة أو الحساب ورمز وصول طويل الأمد.
 - **تيليغرام**: رمز بوت مضاف إلى القناة، ومعرّف القناة.
 - **App Store**: مفتاح App Store Connect API بصلاحية المبيعات ورقم المورّد.
 - **مصادرك الخاصة**: لا يوجد أي منها عند التثبيت؛ اضغط **+ أضف مصدراً** في صفحة الاتصالات، وأدخل الاسم والرابط وأسطراً بصيغة `الاسم = المسار.إلى.القيمة`. أضف ما تشاء منها، واحذف أيّاً منها متى شئت.
 
 الأسرار تُخزَّن مشفّرة ولا تُعرض بعد الحفظ. اترك حقل السر فارغاً للإبقاء على القيمة المحفوظة.
+
+### اللغة
+
+تظهر الإضافة بلغة المستخدم في ووردبريس تلقائياً: العربية والإنجليزية والفرنسية والإسبانية والألمانية والإيطالية والبرتغالية والروسية والتركية والفارسية والأردية والهندية والإندونيسية والصينية واليابانية.
 
 ### من يرى اللوحة
 

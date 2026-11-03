@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.5.0
+
+- **15 languages**: the plugin follows each admin's own WordPress language: Arabic, English, French, Spanish, German, Italian, Portuguese, Russian, Turkish, Persian, Urdu, Hindi, Indonesian, Chinese and Japanese. Regional variants fall back to their language. `bin/l10n-catalog.php` and `bin/l10n-build.php` keep them complete; a test fails on any missing string or broken placeholder.
+- **YouTube without access**: paste any public channel's link or @handle. Numbers come through Marsad Connect's shared key, so no key is needed (your own key and Connect with Google remain).
+- **Instagram without access**: follow any public business or creator account by username (Business Discovery, read through your own connected account).
+- Every setup step has a button that opens the exact page it talks about.
+- **Full history**: the WordPress source imports every day since the first post and keeps it regardless of the retention setting. Posts later moved to the trash still count on the day they were published.
+- **Deleted posts**: posts moved to the trash per day, posts deleted permanently (counted from install), and posts by status (published, drafts, pending, scheduled, private, trash).
+- **All time** range, with monthly columns for long periods.
+
 ## 0.4.1
 
 - Each source now says exactly what it still needs ("Missing: Bot token", "Missing: Connect with Google …") on its card, on the dashboard and right after saving, instead of a plain "Not connected".

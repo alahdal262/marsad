@@ -30,6 +30,7 @@ class Marsad_Connector_Instagram extends Marsad_Connector {
 	public function fields() {
 		return array(
 			'ig_user_id' => array( 'label' => __( 'Instagram account', 'marsad' ), 'type' => 'text', 'help' => __( 'Found automatically from the Facebook Page; pick another one if you have several.', 'marsad' ) ),
+			'username'   => array( 'label' => __( 'Follow a public account instead', 'marsad' ), 'type' => 'text', 'advanced' => true, 'help' => __( 'Any business or creator account by username (without @), even one you do not manage. Your own connected account is used to look it up.', 'marsad' ) ),
 			'token'      => array( 'label' => __( 'Access token', 'marsad' ), 'type' => 'secret', 'advanced' => true, 'help' => __( 'Leave empty to use the Facebook connection\'s token.', 'marsad' ) ),
 		);
 	}
@@ -43,7 +44,7 @@ class Marsad_Connector_Instagram extends Marsad_Connector {
 
 	public function instructions() {
 		return array(
-			__( 'Link the Instagram professional account to your Facebook Page (Instagram → Settings → Account Center).', 'marsad' ),
+			$this->step( __( 'Link your Instagram professional account to your Facebook Page in Accounts Center.', 'marsad' ), 'https://accountscenter.instagram.com/', __( 'Accounts Center', 'marsad' ) ),
 			__( 'Connect Facebook first with the instagram_basic permission; the account then appears here by itself.', 'marsad' ),
 		);
 	}
@@ -87,7 +88,14 @@ class Marsad_Connector_Instagram extends Marsad_Connector {
 			throw new Marsad_Exception( __( 'Pick the Instagram account in the list, then save.', 'marsad' ) );
 		}
 		$token = $accounts[ $id ][1] ?? $token;
-		$u     = Marsad_Http::json( 'GET', Marsad_Connector_Facebook::GRAPH . rawurlencode( $id ) . '?' . http_build_query( array( 'fields' => 'followers_count,media_count', 'access_token' => $token ) ) );
+		$other = ltrim( trim( (string) $this->get( 'username' ) ), '@' );
+		if ( '' !== $other ) {
+			// Business Discovery: public numbers of another professional account, read through ours.
+			$r = Marsad_Http::json( 'GET', Marsad_Connector_Facebook::GRAPH . rawurlencode( $id ) . '?' . http_build_query( array( 'fields' => 'business_discovery.username(' . preg_replace( '/[^A-Za-z0-9._]/', '', $other ) . '){followers_count,media_count}', 'access_token' => $token ) ) );
+			$u = $r['business_discovery'] ?? array();
+		} else {
+			$u = Marsad_Http::json( 'GET', Marsad_Connector_Facebook::GRAPH . rawurlencode( $id ) . '?' . http_build_query( array( 'fields' => 'followers_count,media_count', 'access_token' => $token ) ) );
+		}
 		$day = $this->today();
 		return array(
 			$this->row( 'followers', $day, $u['followers_count'] ?? 0 ),

@@ -26,7 +26,13 @@ class Marsad_Sync {
 			foreach ( Marsad_Registry::enabled() as $c ) {
 				self::run( $c );
 			}
-			Marsad_Store::purge_older_than( Marsad_Plugin::settings()['retention_days'] );
+			$keep = array();
+			foreach ( Marsad_Registry::all() as $c ) {
+				if ( $c->full_history() ) {
+					$keep[] = $c->id();
+				}
+			}
+			Marsad_Store::purge_older_than( Marsad_Plugin::settings()['retention_days'], $keep );
 		} finally {
 			delete_transient( self::LOCK );
 		}
@@ -46,18 +52,30 @@ class Marsad_Sync {
 			? min( (int) Marsad_Plugin::settings()['backfill_days'], $c->max_backfill() )
 			: $c->window_days();
 		$from   = $c->is_snapshot() ? $today : gmdate( 'Y-m-d', time() - max( 1, $days ) * DAY_IN_SECONDS );
+		$start  = '';
+		if ( $c->full_history() ) {
+			// Everything since the first day, once; also for sites that imported less before.
+			$start = $c->history_start();
+			if ( empty( $prev['backfilled_from'] ) || $prev['backfilled_from'] > $start ) {
+				$from = $start;
+			}
+		}
 		$entry  = array(
-			'at'         => time(),
-			'ok'         => false,
-			'message'    => '',
-			'rows'       => 0,
-			'backfilled' => ! empty( $prev['backfilled'] ),
+			'at'              => time(),
+			'ok'              => false,
+			'message'         => '',
+			'rows'            => 0,
+			'backfilled'      => ! empty( $prev['backfilled'] ),
+			'backfilled_from' => $prev['backfilled_from'] ?? '',
 		);
 		try {
 			$rows             = $c->fetch( $from, $today );
 			$entry['rows']    = Marsad_Store::put( $c->id(), $rows );
 			$entry['ok']      = true;
 			$entry['backfilled'] = true;
+			if ( '' !== $start && $from === $start ) {
+				$entry['backfilled_from'] = $start;
+			}
 			/* translators: %d: number of values */
 			$entry['message'] = sprintf( _n( '%d value updated.', '%d values updated.', $entry['rows'], 'marsad' ), $entry['rows'] );
 		} catch ( Exception $e ) {

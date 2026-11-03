@@ -28,14 +28,14 @@ class Marsad_Connector_Search_Console extends Marsad_Connector {
 	public function fields() {
 		return array(
 			'site'            => array( 'label' => __( 'Search Console property', 'marsad' ), 'type' => 'text', 'required' => true, 'help' => __( 'Pick it from the list after connecting Google, or type sc-domain:example.com / https://example.com/.', 'marsad' ) ),
-			'service_account' => array( 'label' => __( 'Service account key (JSON)', 'marsad' ), 'type' => 'textarea_secret', 'advanced' => true, 'help' => __( 'Only if you prefer a service account to "Connect with Google".', 'marsad' ) ),
+			'service_account' => array( 'label' => __( 'Service account key (JSON)', 'marsad' ), 'type' => 'textarea_secret', 'advanced' => true, 'help' => __( 'Only if you prefer a service account to "Connect with Google": create one, add a JSON key, and give its e-mail read access in the product.', 'marsad' ), 'url' => 'https://console.cloud.google.com/iam-admin/serviceaccounts', 'link' => __( 'Service accounts', 'marsad' ) ),
 		);
 	}
 
 	public function instructions() {
 		return array(
 			__( 'Press "Connect with Google" at the top of this page with an account that has access to the site in Search Console.', 'marsad' ),
-			__( 'Pick the property below and save.', 'marsad' ),
+			$this->step( __( 'Pick the property below and save. Not in the list? Add and verify your site in Search Console first.', 'marsad' ), 'https://search.google.com/search-console', __( 'Search Console', 'marsad' ) ),
 		);
 	}
 

@@ -68,6 +68,8 @@ class Marsad_Test_Wpdb {
 	}
 	public function query( $sql ) { $this->queries[] = $sql; return 1; }
 	public function db_server_info() { return '11.8.9-MariaDB'; }
+	public $first_day = null;
+	public function get_var( $sql ) { $this->queries[] = $sql; return false !== strpos( $sql, 'MIN(day)' ) ? $this->first_day : null; }
 	public function get_row( $sql ) { $this->queries[] = $sql; return null; }
 	/** Rows Store reads back: array( source, metric, dim, day, value ). */
 	public $fixture = array();

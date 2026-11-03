@@ -100,10 +100,30 @@ class Marsad_Store {
 		return $out;
 	}
 
-	public static function purge_older_than( $days ) {
+	/**
+	 * @param string[] $keep sources whose whole history stays (the site's own posts)
+	 */
+	public static function purge_older_than( $days, array $keep = array() ) {
+		global $wpdb;
+		$table  = self::table();
+		$except = $keep ? ' AND source NOT IN (' . implode( ',', array_fill( 0, count( $keep ), '%s' ) ) . ')' : '';
+		$wpdb->query( $wpdb->prepare( "DELETE FROM {$table} WHERE day < %s{$except}", array_merge( array( gmdate( 'Y-m-d', time() - (int) $days * DAY_IN_SECONDS ) ), $keep ) ) ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+	}
+
+	/** Add to one day's value (events counted as they happen, such as a permanent deletion). */
+	public static function increment( $source, $metric, $day, $by = 1 ) {
 		global $wpdb;
 		$table = self::table();
-		$wpdb->query( $wpdb->prepare( "DELETE FROM {$table} WHERE day < %s", gmdate( 'Y-m-d', time() - (int) $days * DAY_IN_SECONDS ) ) ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		$wpdb->query( $wpdb->prepare( "INSERT INTO {$table} (source,metric,dim,dim_key,day,value,updated_at) VALUES (%s,%s,'',%s,%s,%f,%s) ON DUPLICATE KEY UPDATE value=value+%f, updated_at=VALUES(updated_at)", $source, $metric, md5( '' ), $day, (float) $by, current_time( 'mysql', true ), (float) $by ) );
+	}
+
+	/** The earliest day anything was recorded, or null when the table is empty. */
+	public static function first_day() {
+		global $wpdb;
+		$table = self::table();
+		$day   = $wpdb->get_var( "SELECT MIN(day) FROM {$table}" ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		return $day ? (string) $day : null;
 	}
 
 	public static function delete_source( $source ) {

@@ -30,7 +30,14 @@ class Marsad_Connector_Telegram extends Marsad_Connector {
 	public function fields() {
 		return array(
 			'chat'  => array( 'label' => __( 'Channel', 'marsad' ), 'type' => 'text', 'required' => true, 'help' => __( '@username of a public channel, or the numeric -100… id.', 'marsad' ) ),
-			'token' => array( 'label' => __( 'Bot token', 'marsad' ), 'type' => 'secret', 'required' => true, 'help' => __( 'Create a bot with @BotFather and add it to the channel as an administrator.', 'marsad' ) ),
+			'token' => array( 'label' => __( 'Bot token', 'marsad' ), 'type' => 'secret', 'required' => true, 'help' => __( 'Any bot works for a public channel; a private channel needs the bot added as an administrator.', 'marsad' ) ),
+		);
+	}
+
+	public function instructions() {
+		return array(
+			$this->step( __( 'Open @BotFather in Telegram, send /newbot, choose a name, and copy the token it replies with.', 'marsad' ), 'https://t.me/BotFather', __( 'Open BotFather', 'marsad' ) ),
+			__( 'Paste the token and your channel\'s @username here, then save.', 'marsad' ),
 		);
 	}
 

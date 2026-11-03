@@ -7,7 +7,7 @@ require_once dirname( __DIR__ ) . '/server/connect/lib.php';
 
 function marsad_relay_cfg() {
 	$dir = sys_get_temp_dir() . '/marsad-relay-' . getmypid();
-	foreach ( (array) glob( $dir . '/*.json' ) as $f ) {
+	foreach ( array_merge( (array) glob( $dir . '/*.json' ), (array) glob( $dir . '/*.cnt' ) ) as $f ) {
 		unlink( $f );
 	}
 	return array( 'client_id' => 'cid', 'client_secret' => 'csecret', 'redirect_uri' => 'https://relay.test/connect/callback.php', 'data_dir' => $dir );

@@ -12,11 +12,28 @@ class Marsad_Plugin {
 	const CRON_HOOK  = 'marsad_sync';
 	const OPT_SETTINGS = 'marsad_settings';
 
+	/**
+	 * The plugin speaks the admin's own language (their profile language, else the site's).
+	 * Files are per language, so fr_FR, fr_CA and fr_BE all read marsad-fr.l10n.php; a
+	 * translation from translate.wordpress.org, if installed, still wins.
+	 */
+	public static function load_translations() {
+		$locale = determine_locale();
+		$lang   = strtolower( substr( $locale, 0, 2 ) );
+		foreach ( array_unique( array( $locale, $lang ) ) as $code ) {
+			if ( is_readable( MARSAD_DIR . 'languages/marsad-' . $code . '.l10n.php' ) ) {
+				load_textdomain( 'marsad', MARSAD_DIR . 'languages/marsad-' . $code . '.mo', $locale );
+				return;
+			}
+		}
+	}
+
 	public static function boot() {
-		load_plugin_textdomain( 'marsad', false, dirname( plugin_basename( MARSAD_FILE ) ) . '/languages' );
+		self::load_translations();
 
 		Marsad_Store::maybe_upgrade();
 		add_filter( 'cron_schedules', array( __CLASS__, 'cron_schedules' ) );
+		add_action( 'before_delete_post', array( 'Marsad_Connector_Wordpress', 'on_delete' ), 10, 2 );
 		add_action( self::CRON_HOOK, array( 'Marsad_Sync', 'run_all' ) );
 		self::ensure_cron();
 

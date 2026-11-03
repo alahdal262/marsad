@@ -7,21 +7,40 @@ defined( 'ABSPATH' ) || exit;
 
 class Marsad_Report {
 
-	const RANGES = array( 7, 28, 90, 365 );
+	/** Days to show; 0 means everything since the first recorded day. */
+	const RANGES = array( 7, 28, 90, 365, 0 );
 
 	/** @var array */
 	public $range;
 	/** @var string[] */
 	public $days;
+	/** @var bool the "All time" view */
+	public $all = false;
 
 	public function __construct( $n ) {
 		$n           = in_array( (int) $n, self::RANGES, true ) ? (int) $n : 28;
-		$this->range = Marsad_Aggregate::range( $n, gmdate( 'Y-m-d' ) );
+		$this->all   = 0 === $n;
+		$this->range = Marsad_Aggregate::range( $this->all ? 1 : $n, gmdate( 'Y-m-d' ) );
+		if ( $this->all ) {
+			// From the first recorded day; there is no earlier period to compare with.
+			$first       = Marsad_Store::first_day();
+			$this->range = array(
+				'from'      => ( $first && $first < $this->range['to'] ) ? $first : gmdate( 'Y-m-d', strtotime( $this->range['to'] . ' UTC' ) - 364 * DAY_IN_SECONDS ),
+				'to'        => $this->range['to'],
+				'prev_from' => null,
+				'prev_to'   => null,
+			);
+		}
 		$this->days  = Marsad_Aggregate::days( $this->range['from'], $this->range['to'] );
 	}
 
 	public function length() {
 		return count( $this->days );
+	}
+
+	/** The menu value of this view: 7, 28, 90, 365 or 0 (all time). */
+	public function key() {
+		return $this->all ? 0 : $this->length();
 	}
 
 	/**
@@ -30,7 +49,7 @@ class Marsad_Report {
 	public function metric( $source, $metric, array $def ) {
 		$agg = $def['agg'] ?? 'sum';
 		$cur = Marsad_Store::daily( $source, $metric, $this->range['from'], $this->until( $agg ) );
-		$pre = Marsad_Store::daily( $source, $metric, $this->range['prev_from'], $this->range['prev_to'] );
+		$pre = null === $this->range['prev_from'] ? array() : Marsad_Store::daily( $source, $metric, $this->range['prev_from'], $this->range['prev_to'] );
 		$value = Marsad_Aggregate::collapse( $cur, $agg );
 		$prev  = Marsad_Aggregate::collapse( $pre, $agg );
 		return array(

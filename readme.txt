@@ -4,7 +4,7 @@ Tags: analytics, statistics, dashboard, google analytics, social media
 Requires at least: 6.5
 Tested up to: 6.8
 Requires PHP: 7.4
-Stable tag: 0.4.1
+Stable tag: 0.5.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -45,6 +45,12 @@ Administrators by default. Choose more roles under Marsad → Settings.
 Hourly by default, through WP-Cron. Use "Sync now" on the dashboard to refresh immediately.
 
 == Changelog ==
+
+= 0.5.0 =
+* In 15 languages, following each admin's WordPress language.
+* Follow any public YouTube channel by pasting its link; any public Instagram business account by username.
+* Every setup step links to the page that has what it asks for.
+* Full publishing history since the first post, deleted posts, posts by status, and an All time view.
 
 = 0.4.1 =
 * Each source says exactly what it still needs instead of "Not connected".

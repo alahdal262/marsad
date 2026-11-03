@@ -81,7 +81,7 @@ function test_overview_tab_shows_headline_chart_categories_and_custom_source() {
 function test_content_tab_shows_totals_authors_roles_and_comments() {
 	marsad_test_seed_dashboard();
 	$h = marsad_test_render_tab( 'content' );
-	foreach ( array( '22,500', '4.3 GB', '28 awaiting moderation', 'Newsroom', 'Editor', '1,081', 'Review 28 pending comments' ) as $needle ) {
+	foreach ( array( '22,500', '4.3 GB', '28 awaiting moderation', 'Newsroom', 'Editor', '1,081', 'Review 28 pending comments', 'Posts by status', 'Deleted permanently', 'Moved to the trash' ) as $needle ) {
 		check( false !== strpos( $h, $needle ), "content tab shows $needle" );
 	}
 }

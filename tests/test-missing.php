@@ -14,7 +14,7 @@ function test_each_source_names_what_it_still_needs() {
 	same( array( 'Bot token' ), $tg->missing() );
 
 	$yt = new Marsad_Connector_Youtube();
-	same( array( 'Connect with Google (or an API key and channel ID)' ), $yt->missing() );
+	same( array( 'Channel link' ), $yt->missing() );
 	marsad_test_connect_google();
 	same( array(), $yt->missing() );
 	same( array(), $ga->missing() );

@@ -41,6 +41,11 @@ class Marsad_Connector_Site extends Marsad_Connector {
 		};
 		return array(
 			'posts_total'       => $last( __( 'Posts', 'marsad' ) ),
+			'posts_draft'       => $last( __( 'Drafts', 'marsad' ) ),
+			'posts_pending'     => $last( __( 'Pending review', 'marsad' ) ),
+			'posts_future'      => $last( __( 'Scheduled', 'marsad' ) ),
+			'posts_private'     => $last( __( 'Private', 'marsad' ) ),
+			'posts_trash'       => $last( __( 'In the trash', 'marsad' ) ),
 			'pages'             => $last( __( 'Pages', 'marsad' ) ),
 			'images'            => $last( __( 'Images', 'marsad' ) ),
 			'videos'            => $last( __( 'Videos', 'marsad' ) ),
@@ -75,7 +80,13 @@ class Marsad_Connector_Site extends Marsad_Connector {
 			}
 		};
 
-		$put( 'posts_total', (int) wp_count_posts( 'post' )->publish );
+		$count = wp_count_posts( 'post' );
+		$put( 'posts_total', (int) $count->publish );
+		$put( 'posts_draft', (int) $count->draft );
+		$put( 'posts_pending', (int) $count->pending );
+		$put( 'posts_future', (int) $count->future );
+		$put( 'posts_private', (int) $count->private );
+		$put( 'posts_trash', (int) $count->trash );
 		$put( 'pages', (int) wp_count_posts( 'page' )->publish );
 		foreach ( self::media_counts( (array) wp_count_attachments() ) as $k => $n ) {
 			$put( 'other' === $k ? 'other_media' : $k, $n );

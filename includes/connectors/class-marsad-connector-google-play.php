@@ -30,7 +30,7 @@ class Marsad_Connector_Google_Play extends Marsad_Connector {
 		return array(
 			'package'         => array( 'label' => __( 'Package name', 'marsad' ), 'type' => 'text', 'required' => true, 'help' => 'com.example.app' ),
 			'bucket'          => array( 'label' => __( 'Reports bucket', 'marsad' ), 'type' => 'text', 'required' => true, 'help' => __( 'Play Console → Download reports → Statistics → "Copy Cloud Storage URI": pubsite_prod_… (without gs://).', 'marsad' ) ),
-			'service_account' => array( 'label' => __( 'Service account key (JSON)', 'marsad' ), 'type' => 'textarea_secret', 'advanced' => true, 'help' => __( 'Only if you prefer a service account to "Connect with Google".', 'marsad' ) ),
+			'service_account' => array( 'label' => __( 'Service account key (JSON)', 'marsad' ), 'type' => 'textarea_secret', 'advanced' => true, 'help' => __( 'Only if you prefer a service account to "Connect with Google": create one, add a JSON key, and give its e-mail read access in the product.', 'marsad' ), 'url' => 'https://console.cloud.google.com/iam-admin/serviceaccounts', 'link' => __( 'Service accounts', 'marsad' ) ),
 		);
 	}
 
@@ -41,7 +41,8 @@ class Marsad_Connector_Google_Play extends Marsad_Connector {
 	public function instructions() {
 		return array(
 			__( 'Press "Connect with Google" at the top of this page with an account that can download reports in Play Console.', 'marsad' ),
-			__( 'Type the package name and the reports bucket, then save.', 'marsad' ),
+			$this->step( __( 'In Play Console open Download reports → Statistics, press "Copy Cloud Storage URI" and paste it as the reports bucket.', 'marsad' ), 'https://play.google.com/console/developers', __( 'Play Console', 'marsad' ) ),
+			__( 'Type the package name (for example com.example.app) and save.', 'marsad' ),
 			__( 'Play writes the reports once a day; new numbers appear with a 1–2 day delay.', 'marsad' ),
 		);
 	}

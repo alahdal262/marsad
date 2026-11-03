@@ -136,7 +136,12 @@ class Marsad_Admin_Connections {
 		if ( $steps ) {
 			echo '<ol class="marsad-steps">';
 			foreach ( $steps as $step ) {
-				echo '<li>' . esc_html( $step ) . '</li>';
+				$step = is_array( $step ) ? $step : array( 'text' => $step, 'url' => '' );
+				echo '<li>' . esc_html( $step['text'] );
+				if ( '' !== $step['url'] ) {
+					echo ' <a class="button button-small marsad-open" href="' . esc_url( $step['url'] ) . '" target="_blank" rel="noopener noreferrer">' . esc_html( $step['link'] ) . ' ↗</a>';
+				}
+				echo '</li>';
 			}
 			echo '</ol>';
 		}
@@ -225,7 +230,11 @@ class Marsad_Admin_Connections {
 			echo '<input type="' . ( 'url' === $type ? 'url' : 'text' ) . '" id="' . esc_attr( $id ) . '" name="' . esc_attr( $name ) . '" value="' . esc_attr( $value ) . '" class="regular-text" dir="ltr">';
 		}
 		if ( ! empty( $f['help'] ) ) {
-			echo '<p class="description">' . esc_html( $f['help'] ) . '</p>';
+			echo '<p class="description">' . esc_html( $f['help'] );
+			if ( ! empty( $f['url'] ) ) {
+				echo ' <a href="' . esc_url( $f['url'] ) . '" target="_blank" rel="noopener noreferrer">' . esc_html( $f['link'] ?? __( 'Open', 'marsad' ) ) . ' ↗</a>';
+			}
+			echo '</p>';
 		}
 		echo $adv ? '</details></td></tr>' : '</td></tr>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 	}

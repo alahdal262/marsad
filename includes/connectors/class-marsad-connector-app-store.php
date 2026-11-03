@@ -40,8 +40,9 @@ class Marsad_Connector_App_Store extends Marsad_Connector {
 
 	public function instructions() {
 		return array(
-			__( 'App Store Connect → Users and Access → Integrations → App Store Connect API → generate a key with the Sales or Finance role.', 'marsad' ),
-			__( 'Download the .p8 file once and paste its contents here, with the Key ID and Issuer ID shown on that page.', 'marsad' ),
+			$this->step( __( 'Generate an API key with the Sales or Finance role. Copy the Issuer ID and Key ID shown on that page.', 'marsad' ), 'https://appstoreconnect.apple.com/access/integrations/api', __( 'App Store Connect API keys', 'marsad' ) ),
+			__( 'Download the .p8 file (Apple lets you download it only once) and paste its contents here.', 'marsad' ),
+			$this->step( __( 'The vendor number is at the top left of Payments and Financial Reports.', 'marsad' ), 'https://appstoreconnect.apple.com/itc/payments_and_financial_reports', __( 'Payments and Financial Reports', 'marsad' ) ),
 			__( 'Apple publishes each day\'s report the next day; today is never available.', 'marsad' ),
 		);
 	}

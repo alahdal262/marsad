@@ -97,7 +97,7 @@ function mc_take( $dir, $key ) {
 }
 
 function mc_sweep( $dir ) {
-	foreach ( (array) glob( $dir . '/*.json' ) as $f ) {
+	foreach ( array_merge( (array) glob( $dir . '/*.json' ), (array) glob( $dir . '/*.cnt' ) ) as $f ) {
 		if ( filemtime( $f ) < time() - 3600 ) {
 			@unlink( $f );
 		}
@@ -215,6 +215,76 @@ function mc_token( array $p, array $cfg, callable $post ) {
 		return mc_json( $code >= 400 && $code < 500 ? $code : 502, array( 'error' => $tok['error'] ?? 'google_error', 'error_description' => $tok['error_description'] ?? '' ) );
 	}
 	return mc_json( 200, array( 'access_token' => $tok['access_token'], 'expires_in' => (int) ( $tok['expires_in'] ?? 3600 ), 'scope' => $tok['scope'] ?? '' ) );
+}
+
+/**
+ * Public YouTube numbers with Marsad's own API key, so a site can follow any channel
+ * by pasting its link. Read-only endpoints and parameters only; answers are cached for
+ * 30 minutes and each address is limited, to keep the shared daily quota fair.
+ *
+ * @param callable $get function( $url ): array( code, body )
+ */
+function mc_youtube( array $q, array $cfg, callable $get, $ip ) {
+	if ( empty( $cfg['youtube_key'] ) ) {
+		return mc_json( 503, array( 'error' => array( 'message' => 'Marsad Connect has no YouTube key yet. Add your own API key in Marsad, or try later.' ) ) );
+	}
+	$allowed = array(
+		'channels'      => array( 'part', 'id', 'forHandle' ),
+		'playlistItems' => array( 'part', 'playlistId', 'maxResults' ),
+		'videos'        => array( 'part', 'id' ),
+	);
+	$endpoint = (string) ( $q['endpoint'] ?? '' );
+	if ( ! isset( $allowed[ $endpoint ] ) ) {
+		return mc_json( 400, array( 'error' => array( 'message' => 'Unsupported request.' ) ) );
+	}
+	$args = array_intersect_key( $q, array_flip( $allowed[ $endpoint ] ) );
+	$args = array_map( function ( $v ) { return substr( (string) $v, 0, 600 ); }, $args );
+	if ( empty( $args['id'] ) && empty( $args['forHandle'] ) && empty( $args['playlistId'] ) ) {
+		return mc_json( 400, array( 'error' => array( 'message' => 'Say which channel: a link, @handle or id.' ) ) );
+	}
+	ksort( $args );
+	$dir   = $cfg['data_dir'];
+	$cache = $dir . '/yt_' . md5( $endpoint . '?' . http_build_query( $args ) ) . '.json';
+	if ( is_file( $cache ) && filemtime( $cache ) > time() - 1800 ) {
+		return mc_json( 200, (array) json_decode( (string) file_get_contents( $cache ), true ) );
+	}
+	if ( ! mc_allow( $dir, 'ytip_' . md5( (string) $ip ), 120, 3600 ) ) {
+		return mc_json( 429, array( 'error' => array( 'message' => 'Too many YouTube requests from this server; try again within the hour.' ) ) );
+	}
+	list( $code, $body ) = $get( 'https://www.googleapis.com/youtube/v3/' . $endpoint . '?' . http_build_query( $args + array( 'key' => $cfg['youtube_key'] ) ) );
+	$data = json_decode( (string) $body, true );
+	if ( 200 !== $code || ! is_array( $data ) ) {
+		return mc_json( $code >= 400 ? $code : 502, is_array( $data ) ? $data : array( 'error' => array( 'message' => 'YouTube did not answer.' ) ) );
+	}
+	if ( ! is_dir( $dir ) ) {
+		mkdir( $dir, 0700, true );
+	}
+	file_put_contents( $cache, json_encode( $data ), LOCK_EX );
+	return mc_json( 200, $data );
+}
+
+/** A small per-key counter in a file: true while under $max hits in the current window. */
+function mc_allow( $dir, $key, $max, $window ) {
+	if ( ! is_dir( $dir ) ) {
+		mkdir( $dir, 0700, true );
+	}
+	$file = $dir . '/' . $key . '.cnt';
+	$data = is_file( $file ) ? json_decode( (string) file_get_contents( $file ), true ) : null;
+	if ( ! is_array( $data ) || $data['start'] < time() - $window ) {
+		$data = array( 'start' => time(), 'n' => 0 );
+	}
+	$data['n']++;
+	file_put_contents( $file, json_encode( $data ), LOCK_EX );
+	return $data['n'] <= $max;
+}
+
+function mc_curl_get( $url ) {
+	$ch = curl_init( $url );
+	curl_setopt_array( $ch, array( CURLOPT_RETURNTRANSFER => true, CURLOPT_TIMEOUT => 20 ) );
+	$body = curl_exec( $ch );
+	$code = (int) curl_getinfo( $ch, CURLINFO_HTTP_CODE );
+	curl_close( $ch );
+	return array( $code, false === $body ? '' : $body );
 }
 
 /** The e-mail claim of an id_token straight from Google's token endpoint (TLS, no need to verify). */
