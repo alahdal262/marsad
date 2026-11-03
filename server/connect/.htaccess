@@ -1,0 +1,5 @@
+# Only the four endpoints and the static pages are reachable.
+<Files "lib.php">
+	Require all denied
+</Files>
+Options -Indexes

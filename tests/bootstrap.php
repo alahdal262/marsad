@@ -39,6 +39,8 @@ function apply_filters( $tag, $v ) { return $v; }
 function wp_parse_args( $a, $d ) { return array_merge( $d, (array) $a ); }
 function current_time( $t, $gmt = 0 ) { return gmdate( 'Y-m-d H:i:s' ); }
 function home_url( $p = '' ) { return 'https://example.test' . $p; }
+function trailingslashit( $s ) { return rtrim( $s, '/' ) . '/'; }
+function get_current_user_id() { return 1; }
 function date_i18n( $f, $t ) { return gmdate( $f, $t ); }
 function is_wp_error( $x ) { return false; }
 

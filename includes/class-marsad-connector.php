@@ -89,6 +89,21 @@ abstract class Marsad_Connector {
 		return isset( $this->values[ $key ] ) && '' !== $this->values[ $key ] ? $this->values[ $key ] : $default;
 	}
 
+	/**
+	 * Values the admin can pick for a field instead of typing them, e.g. the Analytics
+	 * properties of the connected Google account. Null when there is nothing to offer.
+	 *
+	 * @return array|null value => label
+	 */
+	public function choices( $key ) {
+		return null;
+	}
+
+	/** For Google sources: a service account key of its own, or the connected Google account. */
+	protected function has_google_auth() {
+		return '' !== trim( (string) $this->get( 'service_account' ) ) || Marsad_Google_Account::connected();
+	}
+
 	public function is_configured() {
 		foreach ( $this->fields() as $key => $f ) {
 			if ( ! empty( $f['required'] ) && '' === trim( (string) $this->get( $key ) ) ) {

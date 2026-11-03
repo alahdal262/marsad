@@ -30,13 +30,18 @@ class Marsad_Connector_Google_Play extends Marsad_Connector {
 		return array(
 			'package'         => array( 'label' => __( 'Package name', 'marsad' ), 'type' => 'text', 'required' => true, 'help' => 'com.example.app' ),
 			'bucket'          => array( 'label' => __( 'Reports bucket', 'marsad' ), 'type' => 'text', 'required' => true, 'help' => __( 'Play Console → Download reports → Statistics → "Copy Cloud Storage URI": pubsite_prod_… (without gs://).', 'marsad' ) ),
-			'service_account' => array( 'label' => __( 'Service account key (JSON)', 'marsad' ), 'type' => 'textarea_secret', 'required' => true ),
+			'service_account' => array( 'label' => __( 'Service account key (JSON)', 'marsad' ), 'type' => 'textarea_secret', 'advanced' => true, 'help' => __( 'Only if you prefer a service account to "Connect with Google".', 'marsad' ) ),
 		);
+	}
+
+	public function is_configured() {
+		return parent::is_configured() && $this->has_google_auth();
 	}
 
 	public function instructions() {
 		return array(
-			__( 'In Play Console → Users and permissions, invite the service account e-mail and give it "View app information and download bulk reports".', 'marsad' ),
+			__( 'Press "Connect with Google" at the top of this page with an account that can download reports in Play Console.', 'marsad' ),
+			__( 'Type the package name and the reports bucket, then save.', 'marsad' ),
 			__( 'Play writes the reports once a day; new numbers appear with a 1–2 day delay.', 'marsad' ),
 		);
 	}
@@ -63,7 +68,7 @@ class Marsad_Connector_Google_Play extends Marsad_Connector {
 		$bucket  = preg_replace( '#^gs://#', '', trim( (string) $this->get( 'bucket' ), " /\t" ) );
 		$package = trim( (string) $this->get( 'package' ) );
 		try {
-			$auth = array( 'Authorization' => 'Bearer ' . Marsad_Google_Auth::token( $this->get( 'service_account' ), self::SCOPE ) );
+			$auth = Marsad_Google_Account::bearer( $this->get( 'service_account' ), self::SCOPE );
 		} catch ( Marsad_Exception $e ) {
 			throw new Marsad_Exception( Marsad_Google_Auth::explain( $e, 'Cloud Storage', 'storage.googleapis.com' ) );
 		}

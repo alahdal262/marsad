@@ -29,8 +29,8 @@ class Marsad_Connector_Instagram extends Marsad_Connector {
 
 	public function fields() {
 		return array(
-			'ig_user_id' => array( 'label' => __( 'Instagram account ID', 'marsad' ), 'type' => 'text', 'required' => true, 'help' => __( 'From /{page-id}?fields=instagram_business_account in Graph API Explorer.', 'marsad' ) ),
-			'token'      => array( 'label' => __( 'Page access token', 'marsad' ), 'type' => 'secret', 'required' => true, 'help' => __( 'The Page token of the Facebook Page linked to the account, with instagram_basic.', 'marsad' ) ),
+			'ig_user_id' => array( 'label' => __( 'Instagram account', 'marsad' ), 'type' => 'text', 'help' => __( 'Found automatically from the Facebook Page; pick another one if you have several.', 'marsad' ) ),
+			'token'      => array( 'label' => __( 'Access token', 'marsad' ), 'type' => 'secret', 'advanced' => true, 'help' => __( 'Leave empty to use the Facebook connection\'s token.', 'marsad' ) ),
 		);
 	}
 
@@ -41,8 +41,52 @@ class Marsad_Connector_Instagram extends Marsad_Connector {
 		);
 	}
 
+	public function instructions() {
+		return array(
+			__( 'Link the Instagram professional account to your Facebook Page (Instagram → Settings → Account Center).', 'marsad' ),
+			__( 'Connect Facebook first with the instagram_basic permission; the account then appears here by itself.', 'marsad' ),
+		);
+	}
+
+	/** Linked Instagram accounts of the Pages the token sees: array( ig id => array( label, token ) ). */
+	private function accounts() {
+		$own   = trim( (string) $this->get( 'token' ) );
+		$fb    = Marsad_Registry::get( 'facebook' );
+		$token = '' !== $own ? $own : ( $fb ? (string) $fb->get( 'token' ) : '' );
+		$out   = array();
+		foreach ( Marsad_Connector_Facebook::pages( $token ) as $p ) {
+			if ( $p['instagram'] ) {
+				$out[ $p['instagram']['id'] ] = array( '@' . $p['instagram']['username'] . ' · ' . $p['name'], $p['token'] );
+			}
+		}
+		return array( $out, $token );
+	}
+
+	// Runs on every page view, so it must not call Facebook: a token is enough, fetch() finds the account.
+	public function is_configured() {
+		$fb = Marsad_Registry::get( 'facebook' );
+		return '' !== trim( (string) $this->get( 'token' ) ) || ( $fb && '' !== trim( (string) $fb->get( 'token' ) ) );
+	}
+
+	public function choices( $key ) {
+		if ( 'ig_user_id' !== $key ) {
+			return null;
+		}
+		list( $accounts ) = $this->accounts();
+		return $accounts ? array_map( function ( $a ) { return $a[0]; }, $accounts ) : null;
+	}
+
 	public function fetch( $from, $to ) {
-		$u   = Marsad_Http::json( 'GET', Marsad_Connector_Facebook::GRAPH . rawurlencode( trim( (string) $this->get( 'ig_user_id' ) ) ) . '?' . http_build_query( array( 'fields' => 'followers_count,media_count', 'access_token' => $this->get( 'token' ) ) ) );
+		list( $accounts, $token ) = $this->accounts();
+		$id = trim( (string) $this->get( 'ig_user_id' ) );
+		if ( '' === $id && 1 === count( $accounts ) ) {
+			$id = (string) key( $accounts );
+		}
+		if ( '' === $id ) {
+			throw new Marsad_Exception( __( 'Pick the Instagram account in the list, then save.', 'marsad' ) );
+		}
+		$token = $accounts[ $id ][1] ?? $token;
+		$u     = Marsad_Http::json( 'GET', Marsad_Connector_Facebook::GRAPH . rawurlencode( $id ) . '?' . http_build_query( array( 'fields' => 'followers_count,media_count', 'access_token' => $token ) ) );
 		$day = $this->today();
 		return array(
 			$this->row( 'followers', $day, $u['followers_count'] ?? 0 ),

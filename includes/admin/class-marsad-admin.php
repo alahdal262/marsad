@@ -12,7 +12,7 @@ class Marsad_Admin {
 	public static function init() {
 		add_action( 'admin_menu', array( __CLASS__, 'menu' ) );
 		add_action( 'admin_enqueue_scripts', array( __CLASS__, 'assets' ) );
-		foreach ( array( 'save_connector', 'test_connector', 'sync_now', 'forget_connector', 'save_settings', 'check_update' ) as $a ) {
+		foreach ( array( 'save_connector', 'test_connector', 'sync_now', 'forget_connector', 'save_settings', 'check_update', 'google_connect', 'google_return', 'google_disconnect' ) as $a ) {
 			add_action( 'admin_post_marsad_' . $a, array( __CLASS__, 'handle_' . $a ) );
 		}
 		add_filter( 'plugin_action_links_' . plugin_basename( MARSAD_FILE ), array( __CLASS__, 'action_links' ) );
@@ -151,6 +151,49 @@ class Marsad_Admin {
 			Marsad_Store::delete_source( $c->id() );
 		}
 		self::notice( 'success', $c->label() . ': ' . __( 'disconnected.', 'marsad' ) );
+		self::back( 'connections' );
+	}
+
+	/* ── Connect with Google ─────────────────────────────────────────── */
+
+	public static function handle_google_connect() {
+		self::guard( 'google_connect' );
+		$return = add_query_arg( '_wpnonce', wp_create_nonce( 'marsad_google_return' ), admin_url( 'admin-post.php' ) );
+		wp_redirect( Marsad_Google_Account::connect_url( $return ) ); // phpcs:ignore WordPress.Security.SafeRedirect.wp_redirect_wp_redirect -- the relay is a fixed, filterable address.
+		exit;
+	}
+
+	/** Google → relay → here, with a one-time handover code (or the reason it failed). */
+	public static function handle_google_return() {
+		if ( ! current_user_can( Marsad_Plugin::CAP_MANAGE ) ) {
+			wp_die( esc_html__( 'You are not allowed to do this.', 'marsad' ), 403 );
+		}
+		check_admin_referer( 'marsad_google_return' );
+		// phpcs:disable WordPress.Security.NonceVerification.Recommended -- verified above.
+		$error = sanitize_key( wp_unslash( $_GET['marsad_error'] ?? '' ) );
+		$code  = preg_replace( '/[^A-Za-z0-9_-]/', '', (string) wp_unslash( $_GET['marsad_code'] ?? '' ) );
+		// phpcs:enable
+		if ( 'access_denied' === $error ) {
+			self::notice( 'warning', __( 'Google sign-in was cancelled. Nothing was changed.', 'marsad' ) );
+		} elseif ( $error || '' === $code ) {
+			/* translators: %s: short error code */
+			self::notice( 'error', sprintf( __( 'Google sign-in failed (%s). Please try again.', 'marsad' ), $error ? $error : 'no_code' ) );
+		} else {
+			try {
+				Marsad_Google_Account::finish( $code );
+				/* translators: %s: Google account e-mail */
+				self::notice( 'success', sprintf( __( 'Google connected as %s. Now pick your Analytics property, Search Console site and YouTube channel below.', 'marsad' ), Marsad_Google_Account::email() ) );
+			} catch ( Marsad_Exception $e ) {
+				self::notice( 'error', $e->getMessage() );
+			}
+		}
+		self::back( 'connections', array( 'open' => 'ga4' ) );
+	}
+
+	public static function handle_google_disconnect() {
+		self::guard( 'google_disconnect' );
+		Marsad_Google_Account::disconnect();
+		self::notice( 'success', __( 'Google disconnected. Sources that used it stop until you connect again or add a service account.', 'marsad' ) );
 		self::back( 'connections' );
 	}
 

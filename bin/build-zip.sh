@@ -9,7 +9,7 @@ trap 'rm -rf "$stage"' EXIT
 
 mkdir -p "$stage/marsad" "$out"
 rsync -a \
-	--exclude '.git*' --exclude '.github' --exclude 'tests' --exclude 'bin' \
+	--exclude '.git*' --exclude '.github' --exclude 'tests' --exclude 'bin' --exclude 'server' \
 	--exclude 'dist' --exclude '.DS_Store' --exclude 'phpunit*' \
 	"$root/" "$stage/marsad/"
 

@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.4.0
+
+- **Connect with Google**: one sign-in for Analytics, Search Console, YouTube and Google Play, through the Marsad Connect relay. Properties, sites and channels are picked from lists instead of typed.
+- Facebook: paste one token, pick the Page; Marsad keeps the Page's own token, which does not expire. Instagram is found through the Page.
+- Service-account keys and the YouTube API key moved under "Advanced" on each card.
+- `server/connect`: the relay itself, with tests and a privacy policy.
+
 ## 0.3.1
 
 - Hosting tab shows the latest home page response time right away, instead of a dash until the first full day is recorded.

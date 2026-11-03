@@ -35,6 +35,7 @@ class Marsad_Admin_Connections {
 		wp_nonce_field( 'marsad_sync_now' );
 		echo '<input type="hidden" name="action" value="marsad_sync_now"><input type="hidden" name="back" value="connections"><button class="button">' . esc_html__( 'Sync all now', 'marsad' ) . '</button></form></div></div>';
 		Marsad_Admin::print_notice();
+		self::google_card();
 
 		foreach ( $groups as $g => $title ) {
 			if ( empty( $by_group[ $g ] ) && 'custom' !== $g ) {
@@ -54,6 +55,27 @@ class Marsad_Admin_Connections {
 			echo '</div>';
 		}
 		echo '</div>';
+	}
+
+	/**
+	 * One sign-in for every Google source. Service accounts stay available per source.
+	 */
+	private static function google_card() {
+		$on = Marsad_Google_Account::connected();
+		echo '<section class="marsad-google' . ( $on ? ' is-on' : '' ) . '"><div><h2>' . esc_html__( 'Google account', 'marsad' ) . '</h2>';
+		if ( $on ) {
+			/* translators: %s: Google account e-mail */
+			echo '<p>' . esc_html( sprintf( __( 'Connected as %s. Analytics, Search Console, YouTube and Google Play use this account; pick what to follow in each card below.', 'marsad' ), Marsad_Google_Account::email() ) ) . '</p></div>';
+			echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '">';
+			wp_nonce_field( 'marsad_google_disconnect' );
+			echo '<input type="hidden" name="action" value="marsad_google_disconnect"><button class="button-link button-link-delete">' . esc_html__( 'Disconnect Google', 'marsad' ) . '</button></form>';
+		} else {
+			echo '<p>' . esc_html__( 'One sign-in connects Google Analytics, Search Console, YouTube and Google Play. Marsad only reads statistics; you can remove its access at any time.', 'marsad' ) . '</p></div>';
+			echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '">';
+			wp_nonce_field( 'marsad_google_connect' );
+			echo '<input type="hidden" name="action" value="marsad_google_connect"><button class="marsad-btn marsad-btn-google"><span class="marsad-g" aria-hidden="true">G</span>' . esc_html__( 'Connect with Google', 'marsad' ) . '</button></form>';
+		}
+		echo '</section>';
 	}
 
 	/**
@@ -149,7 +171,29 @@ class Marsad_Admin_Connections {
 		$id    = 'marsad-' . $c->id() . '-' . $key;
 		$value = (string) $c->get( $key );
 		$req   = ! empty( $f['required'] ) ? ' <span class="marsad-req">*</span>' : '';
-		echo '<tr><th><label for="' . esc_attr( $id ) . '">' . esc_html( $f['label'] ) . '</label>' . $req . '</th><td>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- $req is static markup.
+		$adv   = ! empty( $f['advanced'] );
+		if ( $adv ) {
+			// Advanced options stay folded unless already in use.
+			echo '<tr class="marsad-adv"><th>' . esc_html__( 'Advanced', 'marsad' ) . '</th><td><details' . ( '' !== $value ? ' open' : '' ) . '><summary><label for="' . esc_attr( $id ) . '">' . esc_html( $f['label'] ) . '</label></summary>';
+		} else {
+			echo '<tr><th><label for="' . esc_attr( $id ) . '">' . esc_html( $f['label'] ) . '</label>' . $req . '</th><td>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- $req is static markup.
+		}
+		$choices = Marsad_Admin_Connections::NEW_ID === $c->id() ? null : $c->choices( $key );
+		if ( $choices ) {
+			if ( '' !== $value && ! isset( $choices[ $value ] ) ) {
+				$choices = array( $value => $value ) + $choices;
+			}
+			echo '<select id="' . esc_attr( $id ) . '" name="' . esc_attr( $name ) . '"><option value="">' . esc_html__( '— Choose —', 'marsad' ) . '</option>';
+			foreach ( $choices as $ov => $ol ) {
+				echo '<option value="' . esc_attr( $ov ) . '"' . selected( $value, (string) $ov, false ) . '>' . esc_html( $ol ) . '</option>';
+			}
+			echo '</select>';
+			if ( ! empty( $f['help'] ) ) {
+				echo '<p class="description">' . esc_html( $f['help'] ) . '</p>';
+			}
+			echo $adv ? '</details></td></tr>' : '</td></tr>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+			return;
+		}
 		if ( Marsad_Registry::is_secret( $type ) ) {
 			$has = Marsad_Registry::has_secret( $c->id(), $key );
 			$ph  = $has ? __( 'Saved — leave empty to keep it', 'marsad' ) : '';
@@ -178,6 +222,6 @@ class Marsad_Admin_Connections {
 		if ( ! empty( $f['help'] ) ) {
 			echo '<p class="description">' . esc_html( $f['help'] ) . '</p>';
 		}
-		echo '</td></tr>';
+		echo $adv ? '</details></td></tr>' : '</td></tr>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 	}
 }

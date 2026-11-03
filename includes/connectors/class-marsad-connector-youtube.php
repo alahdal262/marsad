@@ -31,16 +31,53 @@ class Marsad_Connector_Youtube extends Marsad_Connector {
 
 	public function fields() {
 		return array(
-			'channel_id' => array( 'label' => __( 'Channel ID', 'marsad' ), 'type' => 'text', 'required' => true, 'help' => __( 'Starts with UC… (YouTube Studio → Settings → Channel → Advanced).', 'marsad' ) ),
-			'api_key'    => array( 'label' => __( 'API key', 'marsad' ), 'type' => 'secret', 'required' => true ),
+			'channel_id' => array( 'label' => __( 'Channel', 'marsad' ), 'type' => 'text', 'help' => __( 'Pick it after connecting Google (empty = your own channel), or type an ID starting with UC….', 'marsad' ) ),
+			'api_key'    => array( 'label' => __( 'API key', 'marsad' ), 'type' => 'secret', 'advanced' => true, 'help' => __( 'Only without "Connect with Google": a YouTube Data API v3 key; then the channel ID is required.', 'marsad' ) ),
 		);
 	}
 
 	public function instructions() {
 		return array(
-			__( 'In Google Cloud → APIs & Services enable "YouTube Data API v3".', 'marsad' ),
-			__( 'Credentials → Create credentials → API key. Restrict it to YouTube Data API v3.', 'marsad' ),
+			__( 'Press "Connect with Google" at the top of this page with the account that owns or manages the channel.', 'marsad' ),
+			__( 'Pick the channel below (or leave it empty for your own) and save.', 'marsad' ),
 		);
+	}
+
+	public function is_configured() {
+		if ( '' !== trim( (string) $this->get( 'api_key' ) ) ) {
+			return '' !== trim( (string) $this->get( 'channel_id' ) );
+		}
+		return Marsad_Google_Account::connected();
+	}
+
+	public function choices( $key ) {
+		if ( 'channel_id' !== $key ) {
+			return null;
+		}
+		$data = Marsad_Google_Account::list_cached( self::API . 'channels?part=snippet&mine=true&maxResults=50' );
+		$out  = array();
+		foreach ( $data['items'] ?? array() as $c ) {
+			$out[ $c['id'] ] = ( $c['snippet']['title'] ?? $c['id'] ) . ' (' . $c['id'] . ')';
+		}
+		return $out ? $out : null;
+	}
+
+	/**
+	 * Query args and headers for one call: the API key when one is set, otherwise the Google account.
+	 *
+	 * @throws Marsad_Exception
+	 */
+	private function auth( array $args ) {
+		$key = trim( (string) $this->get( 'api_key' ) );
+		if ( '' !== $key ) {
+			return array( $args + array( 'key' => $key ), array() );
+		}
+		return array( $args, array( 'Authorization' => 'Bearer ' . Marsad_Google_Account::token() ) );
+	}
+
+	private function call( $endpoint, array $args ) {
+		list( $q, $headers ) = $this->auth( $args );
+		return Marsad_Http::json( 'GET', self::API . $endpoint . '?' . http_build_query( $q ), null, $headers );
 	}
 
 	public function metrics() {
@@ -58,9 +95,8 @@ class Marsad_Connector_Youtube extends Marsad_Connector {
 	}
 
 	public function fetch( $from, $to ) {
-		$key     = $this->get( 'api_key' );
 		$channel = trim( (string) $this->get( 'channel_id' ) );
-		$ch      = Marsad_Http::json( 'GET', self::API . 'channels?' . http_build_query( array( 'part' => 'statistics,contentDetails', 'id' => $channel, 'key' => $key ) ) );
+		$ch      = $this->call( 'channels', array( 'part' => 'statistics,contentDetails' ) + ( '' !== $channel ? array( 'id' => $channel ) : array( 'mine' => 'true' ) ) );
 		if ( empty( $ch['items'][0] ) ) {
 			throw new Marsad_Exception( __( 'No channel with this ID.', 'marsad' ) );
 		}
@@ -73,10 +109,10 @@ class Marsad_Connector_Youtube extends Marsad_Connector {
 		);
 		$uploads = $ch['items'][0]['contentDetails']['relatedPlaylists']['uploads'] ?? '';
 		if ( $uploads ) {
-			$list = Marsad_Http::json( 'GET', self::API . 'playlistItems?' . http_build_query( array( 'part' => 'contentDetails', 'playlistId' => $uploads, 'maxResults' => 25, 'key' => $key ) ) );
+			$list = $this->call( 'playlistItems', array( 'part' => 'contentDetails', 'playlistId' => $uploads, 'maxResults' => 25 ) );
 			$ids  = array_filter( array_map( function ( $i ) { return $i['contentDetails']['videoId'] ?? ''; }, $list['items'] ?? array() ) );
 			if ( $ids ) {
-				$vids = Marsad_Http::json( 'GET', self::API . 'videos?' . http_build_query( array( 'part' => 'snippet,statistics', 'id' => implode( ',', $ids ), 'key' => $key ) ) );
+				$vids = $this->call( 'videos', array( 'part' => 'snippet,statistics', 'id' => implode( ',', $ids ) ) );
 				foreach ( $vids['items'] ?? array() as $v ) {
 					$rows[] = $this->row( 'video_views', $day, $v['statistics']['viewCount'] ?? 0, $v['snippet']['title'] ?? $v['id'] );
 				}

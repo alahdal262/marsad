@@ -29,18 +29,40 @@ class Marsad_Connector_Ga4 extends Marsad_Connector {
 
 	public function fields() {
 		return array(
-			'property_id'     => array( 'label' => __( 'Property ID', 'marsad' ), 'type' => 'text', 'required' => true, 'help' => __( 'Digits only, e.g. 256087272 (Admin → Property settings).', 'marsad' ) ),
-			'service_account' => array( 'label' => __( 'Service account key (JSON)', 'marsad' ), 'type' => 'textarea_secret', 'required' => true ),
+			'property_id'     => array( 'label' => __( 'Analytics property', 'marsad' ), 'type' => 'text', 'required' => true, 'help' => __( 'Pick it from the list after connecting Google, or type the property ID (digits only, Admin → Property settings).', 'marsad' ) ),
+			'service_account' => array( 'label' => __( 'Service account key (JSON)', 'marsad' ), 'type' => 'textarea_secret', 'advanced' => true, 'help' => __( 'Only if you prefer a service account to "Connect with Google".', 'marsad' ) ),
 		);
 	}
 
 	public function instructions() {
 		return array(
-			__( 'In Google Cloud create (or reuse) a service account and download a JSON key.', 'marsad' ),
-			__( 'In the same Cloud project enable "Google Analytics Data API".', 'marsad' ),
-			__( 'In Google Analytics → Admin → Property access management, add the service account e-mail as Viewer.', 'marsad' ),
-			__( 'Paste the property ID and the JSON key here, save, then press Test.', 'marsad' ),
+			__( 'Press "Connect with Google" at the top of this page and sign in with an account that can see your Analytics.', 'marsad' ),
+			__( 'Pick the property below and save.', 'marsad' ),
 		);
+	}
+
+	public function is_configured() {
+		return parent::is_configured() && $this->has_google_auth();
+	}
+
+	public function choices( $key ) {
+		if ( 'property_id' !== $key ) {
+			return null;
+		}
+		$data = Marsad_Google_Account::list_cached( 'https://analyticsadmin.googleapis.com/v1beta/accountSummaries?pageSize=200' );
+		return $data ? self::properties( $data ) : null;
+	}
+
+	/** Property pick-list from the Admin API accountSummaries answer. Public for tests. */
+	public static function properties( array $data ) {
+		$out = array();
+		foreach ( $data['accountSummaries'] ?? array() as $acc ) {
+			foreach ( $acc['propertySummaries'] ?? array() as $p ) {
+				$id         = preg_replace( '/\D/', '', (string) ( $p['property'] ?? '' ) );
+				$out[ $id ] = ( $acc['displayName'] ?? '' ) . ' › ' . ( $p['displayName'] ?? $id ) . ' (' . $id . ')';
+			}
+		}
+		return $out ? $out : null;
 	}
 
 	public function max_backfill() {
@@ -75,7 +97,7 @@ class Marsad_Connector_Ga4 extends Marsad_Connector {
 			throw new Marsad_Exception( __( 'Property ID is missing.', 'marsad' ) );
 		}
 		try {
-			$token = Marsad_Google_Auth::token( $this->get( 'service_account' ), self::SCOPE );
+			$auth  = Marsad_Google_Account::bearer( $this->get( 'service_account' ), self::SCOPE );
 			$range = array( array( 'startDate' => $from, 'endDate' => $to ) );
 			$data  = Marsad_Http::json(
 				'POST',
@@ -89,7 +111,7 @@ class Marsad_Connector_Ga4 extends Marsad_Connector {
 						$this->report( $range, array( 'date', 'country' ), array( 'activeUsers' ), 'activeUsers', 30 * $this->span( $from, $to ) ),
 					),
 				),
-				array( 'Authorization' => 'Bearer ' . $token )
+				$auth
 			);
 			$extra = Marsad_Http::json(
 				'POST',
@@ -100,7 +122,7 @@ class Marsad_Connector_Ga4 extends Marsad_Connector {
 						$this->report( $range, array( 'date', 'deviceCategory' ), array( 'activeUsers' ) ),
 					),
 				),
-				array( 'Authorization' => 'Bearer ' . $token )
+				$auth
 			);
 		} catch ( Marsad_Exception $e ) {
 			throw new Marsad_Exception( Marsad_Google_Auth::explain( $e, 'Google Analytics Data API', 'analyticsdata.googleapis.com' ), (int) $e->getCode() );

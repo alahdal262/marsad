@@ -27,16 +27,40 @@ class Marsad_Connector_Search_Console extends Marsad_Connector {
 
 	public function fields() {
 		return array(
-			'site'            => array( 'label' => __( 'Search Console property', 'marsad' ), 'type' => 'text', 'required' => true, 'help' => __( 'Either sc-domain:example.com (domain property) or https://example.com/ (URL-prefix property).', 'marsad' ) ),
-			'service_account' => array( 'label' => __( 'Service account key (JSON)', 'marsad' ), 'type' => 'textarea_secret', 'required' => true, 'help' => __( 'The same key as Google Analytics works.', 'marsad' ) ),
+			'site'            => array( 'label' => __( 'Search Console property', 'marsad' ), 'type' => 'text', 'required' => true, 'help' => __( 'Pick it from the list after connecting Google, or type sc-domain:example.com / https://example.com/.', 'marsad' ) ),
+			'service_account' => array( 'label' => __( 'Service account key (JSON)', 'marsad' ), 'type' => 'textarea_secret', 'advanced' => true, 'help' => __( 'Only if you prefer a service account to "Connect with Google".', 'marsad' ) ),
 		);
 	}
 
 	public function instructions() {
 		return array(
-			__( 'Enable "Google Search Console API" in the service account\'s Cloud project.', 'marsad' ),
-			__( 'In Search Console → Settings → Users and permissions, add the service account e-mail with Restricted permission.', 'marsad' ),
+			__( 'Press "Connect with Google" at the top of this page with an account that has access to the site in Search Console.', 'marsad' ),
+			__( 'Pick the property below and save.', 'marsad' ),
 		);
+	}
+
+	public function is_configured() {
+		return parent::is_configured() && $this->has_google_auth();
+	}
+
+	public function choices( $key ) {
+		if ( 'site' !== $key ) {
+			return null;
+		}
+		$data = Marsad_Google_Account::list_cached( 'https://www.googleapis.com/webmasters/v3/sites' );
+		return $data ? self::sites( $data ) : null;
+	}
+
+	/** Verified properties from the sites.list answer. Public for tests. */
+	public static function sites( array $data ) {
+		$out = array();
+		foreach ( $data['siteEntry'] ?? array() as $s ) {
+			if ( 'siteUnverifiedUser' !== ( $s['permissionLevel'] ?? '' ) && ! empty( $s['siteUrl'] ) ) {
+				$out[ $s['siteUrl'] ] = $s['siteUrl'];
+			}
+		}
+		ksort( $out );
+		return $out ? $out : null;
 	}
 
 	// Search Console publishes data with a 2–3 day delay; keep refreshing a week.
@@ -67,9 +91,8 @@ class Marsad_Connector_Search_Console extends Marsad_Connector {
 	public function fetch( $from, $to ) {
 		$site = trim( (string) $this->get( 'site' ) );
 		try {
-			$token = Marsad_Google_Auth::token( $this->get( 'service_account' ), self::SCOPE );
+			$auth  = Marsad_Google_Account::bearer( $this->get( 'service_account' ), self::SCOPE );
 			$url   = 'https://www.googleapis.com/webmasters/v3/sites/' . rawurlencode( $site ) . '/searchAnalytics/query';
-			$auth  = array( 'Authorization' => 'Bearer ' . $token );
 			$total = Marsad_Http::json( 'POST', $url, array( 'startDate' => $from, 'endDate' => $to, 'dimensions' => array( 'date' ), 'rowLimit' => 25000 ), $auth );
 			$query = Marsad_Http::json( 'POST', $url, array( 'startDate' => $from, 'endDate' => $to, 'dimensions' => array( 'date', 'query' ), 'rowLimit' => 25000 ), $auth );
 			$page  = Marsad_Http::json( 'POST', $url, array( 'startDate' => $from, 'endDate' => $to, 'dimensions' => array( 'date', 'page' ), 'rowLimit' => 25000 ), $auth );

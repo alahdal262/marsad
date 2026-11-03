@@ -164,6 +164,18 @@ class Marsad_Registry {
 		return $c;
 	}
 
+	/**
+	 * Replace one stored value of a source, e.g. when a connector trades a temporary token
+	 * for a permanent one. Secrets are encrypted as usual.
+	 */
+	public static function remember( Marsad_Connector $c, $key, $value ) {
+		$saved = self::saved();
+		$type  = $c->fields()[ $key ]['type'] ?? 'text';
+		$saved[ $c->id() ]['values'][ $key ] = self::is_secret( $type ) ? Marsad_Crypto::encrypt( (string) $value ) : (string) $value;
+		update_option( self::OPT, $saved, false );
+		self::$cache = null;
+	}
+
 	public static function forget( $id ) {
 		$saved = self::saved();
 		unset( $saved[ $id ] );

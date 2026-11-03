@@ -24,17 +24,21 @@ Later releases appear in **Dashboard → Updates** like any other plugin. To tur
 |---|---|---|
 | WordPress | Posts and comments per day; posts by author and category | Nothing. Always on. |
 | Site & hosting | Totals of posts, pages, images, videos, comments and users by role; database and uploads size; home page response time; software versions and scheduled-task health | Nothing. Always on. |
-| Google Analytics 4 | Users, new users, sessions, views, engagement; top pages, platforms, channels, sources, countries, devices | GA4 property ID and a Google service-account JSON key with **Viewer** on the property |
-| Search Console | Clicks, impressions, CTR, position; top queries and pages | Property (`https://example.com/` or `sc-domain:example.com`) and a service account added as a user |
-| YouTube | Subscribers, total views, videos; views of recent uploads | Channel ID and a YouTube Data API key |
-| Facebook Page | Followers, fans, people talking about the page | Page ID and a long-lived Page access token |
-| Instagram | Followers, posts | Instagram business account ID and a token |
+| Google Analytics 4 | Users, new users, sessions, views, engagement; top pages, platforms, channels, sources, countries, devices | **Connect with Google**, then pick the property (advanced: a service-account key) |
+| Search Console | Clicks, impressions, CTR, position; top queries and pages | **Connect with Google**, then pick the site (advanced: a service-account key) |
+| YouTube | Subscribers, total views, videos; views of recent uploads | **Connect with Google** (your own channel, or pick one) — advanced: an API key and channel ID |
+| Facebook Page | Followers, fans, people talking about the page | Paste one token from Facebook's token tools, pick the Page; Marsad keeps the Page's never-expiring token |
+| Instagram | Followers, posts | Nothing more: found through the Facebook Page it is linked to |
 | Telegram | Channel or group members | Bot token (the bot must be in the channel) and `@channel` or chat ID |
-| Google Play | Daily installs, uninstalls, active devices, total users | Package name, the reports bucket (`pubsite_prod_…`), and a service account invited in Play Console |
+| Google Play | Daily installs, uninstalls, active devices, total users | **Connect with Google** with an account that can download Play reports, plus the package name and reports bucket |
 | App Store | Downloads, re-downloads, updates; downloads by country | App Store Connect API key (Issuer ID, Key ID, `.p8`) with Sales access, vendor number; optional Apple ID to filter one app |
 | Your own sources | Any numbers from a URL that returns JSON. None exist until you press **+ Add a source**; add as many as you need | URL and a list of `Label = path.to.value` lines |
 
-Every Google source uses the same kind of key: in Google Cloud, create a service account, create a JSON key for it, enable the API named on the connection card, and give the service account's email access in the product. The Connections page shows that email after you save the key, and turns "API not enabled" errors into the exact step to fix them.
+### Connect with Google
+
+One button connects Analytics, Search Console, YouTube and Google Play. The sign-in passes through **Marsad Connect** (`server/connect` in this repository), which holds Marsad's Google OAuth client so no site has to register its own. It keeps no tokens: the site that started the sign-in collects them once with a one-time secret, and later asks the relay for fresh access tokens with its refresh token. The statistics go straight from Google to your site. Privacy policy: https://form.yementv.tv/connect/privacy.html
+
+Prefer not to use the relay? Each Google card still accepts a service-account key under **Advanced**, or you can run your own relay and point the plugin at it with `define( 'MARSAD_CONNECT_URL', 'https://your.domain/connect/' );`.
 
 Secrets are encrypted at rest (AES-256-GCM, keyed from your `wp-config.php` salts) and are never shown again after saving. Leave a secret field empty to keep the stored value.
 
@@ -88,6 +92,22 @@ php tests/run.php
 ```
 
 No Composer or WordPress install needed; `tests/bootstrap.php` stubs what the code uses. CI runs lint and tests on PHP 7.4 and 8.3.
+
+### Running Marsad Connect
+
+Copy `server/connect/` to any PHP host with HTTPS and create `marsad-connect/config.php` four folders up (or set `MARSAD_CONNECT_CONFIG` to its path):
+
+```php
+<?php
+return array(
+	'client_id'     => '….apps.googleusercontent.com',
+	'client_secret' => '…',
+	'redirect_uri'  => 'https://your.domain/connect/callback.php',
+	'data_dir'      => __DIR__ . '/tmp',
+);
+```
+
+In Google Cloud: enable the Analytics Data, Analytics Admin, Search Console, YouTube Data and Cloud Storage APIs; create an OAuth consent screen (External, publish it to Production so refresh tokens do not expire after 7 days) and a Web OAuth client with the redirect URI above.
 
 ### Releasing
 

@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Marsad Connect — Privacy policy</title>
+<style>
+body { margin: 0; background: #f4f5f7; color: #111827; font: 16px/1.7 -apple-system, BlinkMacSystemFont, "Segoe UI", Tahoma, Arial, sans-serif; }
+main { max-width: 46rem; margin: 0 auto; padding: 48px 20px 64px; }
+section { background: #fff; border: 1px solid #e3e6eb; border-radius: 14px; padding: 24px 28px; margin-block-end: 24px; }
+h1 { font-size: 28px; margin: 0 0 8px; }
+h2 { font-size: 19px; margin: 24px 0 6px; }
+p, li { color: #374151; }
+a { color: #1d4ed8; }
+.muted { color: #5b6472; font-size: 14px; }
+</style>
+</head>
+<body>
+<main>
+<h1>Marsad Connect — Privacy policy</h1>
+<p class="muted">Last updated 3 November 2026</p>
+
+<section>
+<h2>What Marsad Connect is</h2>
+<p>Marsad is a free, open-source WordPress plugin that shows a website's statistics in its own admin area. Marsad Connect is the small service at this address that lets a Marsad site connect a Google account with one click. Its source code is public at <a href="https://github.com/alahdal262/marsad">github.com/alahdal262/marsad</a> (folder <code>server/connect</code>).</p>
+
+<h2>What we access</h2>
+<p>When a site owner presses "Connect with Google", Google asks them to allow read-only access to:</p>
+<ul>
+<li>Google Analytics (read only) — visitors, page views and traffic sources;</li>
+<li>Google Search Console (read only) — search clicks and queries;</li>
+<li>YouTube (read only) — channel subscribers and video views;</li>
+<li>Google Cloud Storage (read only) — the Google Play statistics reports Play Console stores for the owner;</li>
+<li>the account's e-mail address, shown back to the owner as "Connected as …".</li>
+</ul>
+<p>Marsad never asks for permission to change anything in these services.</p>
+
+<h2>What we keep</h2>
+<p>Nothing. After Google approves, this service passes the access tokens to the WordPress site that started the sign-in (proven with a one-time secret only that site holds) and deletes them within five minutes, or at once when the site collects them. Later, when the site needs a fresh access token, it sends its refresh token here; we forward it to Google with our client credentials and return the answer without storing it. We do not log tokens, statistics or e-mail addresses.</p>
+<p>The statistics themselves go directly from Google to the owner's website and are stored only in that website's own database.</p>
+
+<h2>Use of Google user data</h2>
+<p>Marsad's use and transfer of information received from Google APIs adheres to the <a href="https://developers.google.com/terms/api-services-user-data-policy">Google API Services User Data Policy</a>, including the Limited Use requirements. The data is used only to show the owner their own statistics. It is not sold, not used for advertising, and not shared with anyone else.</p>
+
+<h2>Removing access</h2>
+<p>Press "Disconnect Google" in Marsad → Connections, or remove "Marsad" at <a href="https://myaccount.google.com/permissions">myaccount.google.com/permissions</a>. Either one ends access at once.</p>
+
+<h2>Contact</h2>
+<p>Questions or requests: open an issue at <a href="https://github.com/alahdal262/marsad/issues">github.com/alahdal262/marsad/issues</a>.</p>
+</section>
+
+<section dir="rtl" lang="ar">
+<h1 style="font-size:24px">سياسة الخصوصية — مَرصَد كونكت</h1>
+<p>«مَرصَد» إضافة ووردبريس مجانية ومفتوحة المصدر تعرض إحصاءات الموقع داخل لوحة تحكمه. و«مَرصَد كونكت» خدمة صغيرة على هذا العنوان تتيح للموقع ربط حساب جوجل بضغطة واحدة.</p>
+<p><strong>ما نطلبه:</strong> قراءة فقط لإحصاءات Google Analytics وSearch Console ويوتيوب وتقارير Google Play، وعنوان البريد لعرض «متصل بحساب …». لا نطلب أي صلاحية تعديل.</p>
+<p><strong>ما نحتفظ به:</strong> لا شيء. نسلّم رموز الوصول للموقع الذي بدأ الربط ونحذفها خلال خمس دقائق على الأكثر، ولا نسجّل الرموز ولا الإحصاءات ولا البريد. الإحصاءات تذهب من جوجل إلى موقعك مباشرة وتُحفظ في قاعدة بياناته وحده.</p>
+<p><strong>إلغاء الوصول:</strong> زر «افصل جوجل» في الإضافة، أو من <a href="https://myaccount.google.com/permissions">myaccount.google.com/permissions</a>.</p>
+</section>
+</main>
+</body>
+</html>
