@@ -54,7 +54,7 @@ Secrets are encrypted at rest (AES-256-GCM, keyed from your `wp-config.php` salt
 
 Marsad follows each admin's own WordPress language (their profile language, else the site's): Arabic, English, French, Spanish, German, Italian, Portuguese, Russian, Turkish, Persian, Urdu, Hindi, Indonesian, Chinese and Japanese. Regional variants use their language's file (fr_CA reads French).
 
-To add or fix a language: `php bin/l10n-catalog.php . > catalog.json`, translate it into `{"singles": {english: text}, "plurals": [[forms…]]}`, then `php bin/l10n-build.php catalog.json tr-xx.json xx`. The build refuses missing strings and changed placeholders.
+To add or fix a language: `php bin/l10n-catalog.php . > catalog.json`, edit or add `languages/source/tr-xx.json` (`{"singles": {english: text}, "plurals": [[forms…]]}`), then `php bin/l10n-build.php catalog.json languages/source/tr-xx.json xx`. The build refuses missing strings and changed placeholders.
 
 ## For developers
 

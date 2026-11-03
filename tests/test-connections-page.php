@@ -21,6 +21,7 @@ function marsad_render_connections() {
 }
 
 function test_connections_page_offers_google_button_and_folds_service_accounts() {
+	set_transient( 'marsad_relay_status', array( 'google' => true, 'youtube' => true ) );
 	$h = marsad_render_connections();
 	check( false !== strpos( $h, 'Connect with Google' ) );
 	check( false !== strpos( $h, 'name="action" value="marsad_google_connect"' ) );

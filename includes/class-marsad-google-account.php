@@ -23,6 +23,24 @@ class Marsad_Google_Account {
 		return trailingslashit( apply_filters( 'marsad_connect_url', $url ) );
 	}
 
+	/**
+	 * Whether Marsad Connect can do something right now ('google' sign-in, 'youtube' public
+	 * numbers). Cached briefly; an unreachable relay counts as not ready.
+	 */
+	public static function relay_ready( $what ) {
+		$status = get_transient( 'marsad_relay_status' );
+		if ( ! is_array( $status ) ) {
+			try {
+				$res    = Marsad_Http::request( 'GET', self::relay() . 'status.php', array( 'timeout' => 8 ) );
+				$status = 200 === $res['code'] ? (array) json_decode( $res['body'], true ) : array();
+			} catch ( Marsad_Exception $e ) {
+				$status = array();
+			}
+			set_transient( 'marsad_relay_status', $status, $status ? 10 * MINUTE_IN_SECONDS : 2 * MINUTE_IN_SECONDS );
+		}
+		return ! empty( $status[ $what ] );
+	}
+
 	public static function connected() {
 		$a = get_option( self::OPT, array() );
 		return ! empty( $a['refresh'] );

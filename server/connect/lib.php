@@ -287,6 +287,17 @@ function mc_curl_get( $url ) {
 	return array( $code, false === $body ? '' : $body );
 }
 
+/** What this relay can do right now, so sites never send people to a dead end. */
+function mc_status( array $cfg ) {
+	return mc_json(
+		200,
+		array(
+			'google'  => ! empty( $cfg['client_id'] ) && ! empty( $cfg['client_secret'] ),
+			'youtube' => ! empty( $cfg['youtube_key'] ),
+		)
+	);
+}
+
 /** The e-mail claim of an id_token straight from Google's token endpoint (TLS, no need to verify). */
 function mc_id_token_email( $jwt ) {
 	$parts = explode( '.', (string) $jwt );

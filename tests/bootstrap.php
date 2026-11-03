@@ -19,7 +19,8 @@ $GLOBALS['wp_test_transients'] = array();
 
 function marsad_test_reset() {
 	$GLOBALS['wp_test_options']    = array();
-	$GLOBALS['wp_test_transients'] = array();
+	// No network in tests: the relay answers "not ready" unless a test says otherwise.
+	$GLOBALS['wp_test_transients'] = array( 'marsad_relay_status' => array( 'google' => false, 'youtube' => false ) );
 	Marsad_Http::$mock             = null;
 	Marsad_Registry::reset_cache();
 	$GLOBALS['wpdb']               = new Marsad_Test_Wpdb();

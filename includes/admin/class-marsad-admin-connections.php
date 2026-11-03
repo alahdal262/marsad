@@ -69,11 +69,14 @@ class Marsad_Admin_Connections {
 			echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '">';
 			wp_nonce_field( 'marsad_google_disconnect' );
 			echo '<input type="hidden" name="action" value="marsad_google_disconnect"><button class="button-link button-link-delete">' . esc_html__( 'Disconnect Google', 'marsad' ) . '</button></form>';
-		} else {
+		} elseif ( Marsad_Google_Account::relay_ready( 'google' ) ) {
 			echo '<p>' . esc_html__( 'One sign-in connects Google Analytics, Search Console, YouTube and Google Play. Marsad only reads statistics; you can remove its access at any time.', 'marsad' ) . '</p></div>';
 			echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '">';
 			wp_nonce_field( 'marsad_google_connect' );
 			echo '<input type="hidden" name="action" value="marsad_google_connect"><button class="marsad-btn marsad-btn-google"><span class="marsad-g" aria-hidden="true">G</span>' . esc_html__( 'Connect with Google', 'marsad' ) . '</button></form>';
+		} else {
+			// Never offer a button that ends on an error page.
+			echo '<p>' . esc_html__( 'One-click Google sign-in is not available right now. Each Google card below still works with a service account key: open "Advanced" in the card and follow its link. YouTube needs only the channel link.', 'marsad' ) . '</p></div>';
 		}
 		echo '</section>';
 	}

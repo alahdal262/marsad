@@ -106,3 +106,28 @@ function test_youtube_uses_own_channel_through_the_account() {
 	same( 'Bearer AT1', $seen[0][1] );
 	near( 5, $rows[0]['value'] );
 }
+
+function test_connect_button_only_when_the_relay_can_sign_in() {
+	Marsad_Http::$mock = function ( $m, $url ) {
+		same( 'https://form.yementv.tv/connect/status.php', $url );
+		return array( 'code' => 200, 'body' => '{"google":false,"youtube":false}', 'headers' => array() );
+	};
+	check( ! Marsad_Google_Account::relay_ready( 'google' ) );
+	$h = marsad_render_connections();
+	check( false === strpos( $h, 'value="marsad_google_connect"' ), 'no dead-end button' );
+	check( false !== strpos( $h, 'service account' ), 'offers the way that works today' );
+
+	delete_transient( 'marsad_relay_status' );
+	Marsad_Http::$mock = function () { return array( 'code' => 200, 'body' => '{"google":true,"youtube":true}', 'headers' => array() ); };
+	check( Marsad_Google_Account::relay_ready( 'google' ) );
+	check( false !== strpos( marsad_render_connections(), 'value="marsad_google_connect"' ) );
+}
+
+function test_relay_status_reports_what_is_configured() {
+	$cfg = marsad_relay_cfg();
+	list( $st, , $body ) = mc_status( $cfg );
+	same( 200, $st );
+	same( array( 'google' => true, 'youtube' => false ), json_decode( $body, true ) );
+	list( , , $body ) = mc_status( array( 'client_id' => '', 'client_secret' => '' ) + $cfg );
+	same( false, json_decode( $body, true )['google'] );
+}

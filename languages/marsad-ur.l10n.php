@@ -6,6 +6,8 @@ return array (
   'language' => 'ur',
   'messages' => 
   array (
+    'One-click Google sign-in is not available right now. Each Google card below still works with a service account key: open "Advanced" in the card and follow its link. YouTube needs only the channel link.' => 'ایک کلک میں گوگل سائن اِن ابھی دستیاب نہیں ہے۔ نیچے ہر گوگل کارڈ سروس اکاؤنٹ کی کلید کے ساتھ اب بھی کام کرتا ہے: کارڈ میں «ایڈوانسڈ» کھولیں اور اس کا لنک دیکھیں۔ یوٹیوب کے لیے صرف چینل کا لنک کافی ہے۔',
+    'One-click Google sign-in is not available right now. Use a service account key under "Advanced" in each Google card.' => 'ایک کلک میں گوگل سائن اِن ابھی دستیاب نہیں ہے۔ ہر گوگل کارڈ میں «ایڈوانسڈ» کے تحت سروس اکاؤنٹ کی کلید استعمال کریں۔',
     'App Store' => 'App Store',
     'First-time downloads, re-downloads and updates of your iPhone, iPad and Apple TV apps, by country.' => 'آپ کی iPhone، iPad اور Apple TV ایپس کے پہلی بار ڈاؤن لوڈز، دوبارہ ڈاؤن لوڈز اور اپ ڈیٹس، ملک کے لحاظ سے۔',
     'Issuer ID' => 'جاری کنندہ کی شناخت (Issuer ID)',

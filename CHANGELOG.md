@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.5.1
+
+- "Connect with Google" appears only when Marsad Connect can actually sign in (checked through its new `status.php`); otherwise the card explains the way that works today instead of sending people to an error page.
+- Translation sources live in `languages/source/` so rebuilds keep every string.
+
 ## 0.5.0
 
 - **15 languages**: the plugin follows each admin's own WordPress language: Arabic, English, French, Spanish, German, Italian, Portuguese, Russian, Turkish, Persian, Urdu, Hindi, Indonesian, Chinese and Japanese. Regional variants fall back to their language. `bin/l10n-catalog.php` and `bin/l10n-build.php` keep them complete; a test fails on any missing string or broken placeholder.

@@ -6,6 +6,8 @@ return array (
   'language' => 'it',
   'messages' => 
   array (
+    'One-click Google sign-in is not available right now. Each Google card below still works with a service account key: open "Advanced" in the card and follow its link. YouTube needs only the channel link.' => 'L\'accesso con Google in un clic non è disponibile al momento. Ogni scheda Google qui sotto funziona comunque con una chiave di account di servizio: apri "Avanzate" nella scheda e segui il link. Per YouTube basta il link del canale.',
+    'One-click Google sign-in is not available right now. Use a service account key under "Advanced" in each Google card.' => 'L\'accesso con Google in un clic non è disponibile al momento. Usa una chiave di account di servizio in "Avanzate" in ogni scheda Google.',
     'App Store' => 'App Store',
     'First-time downloads, re-downloads and updates of your iPhone, iPad and Apple TV apps, by country.' => 'Primi download, nuovi download e aggiornamenti delle tue app per iPhone, iPad e Apple TV, per paese.',
     'Issuer ID' => 'ID emittente',

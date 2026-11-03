@@ -161,6 +161,10 @@ class Marsad_Admin {
 
 	public static function handle_google_connect() {
 		self::guard( 'google_connect' );
+		if ( ! Marsad_Google_Account::relay_ready( 'google' ) ) {
+			self::notice( 'error', __( 'One-click Google sign-in is not available right now. Use a service account key under "Advanced" in each Google card.', 'marsad' ) );
+			self::back( 'connections' );
+		}
 		$return = add_query_arg( '_wpnonce', wp_create_nonce( 'marsad_google_return' ), admin_url( 'admin-post.php' ) );
 		wp_redirect( Marsad_Google_Account::connect_url( $return ) ); // phpcs:ignore WordPress.Security.SafeRedirect.wp_redirect_wp_redirect -- the relay is a fixed, filterable address.
 		exit;
