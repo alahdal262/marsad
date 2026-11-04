@@ -490,10 +490,18 @@ class Marsad_Connector_Search_Console extends Marsad_Connector {
 		}
 		$rows = $queries_table['rows'] ?? array();
 		$top  = 0;
+		foreach ( $rows as $r ) {
+			$top = max( $top, (float) $r['m'][ $at['impressions'] ] );
+		}
+		$floor = max( 50, 0.01 * $top );
+		// Peers are only queries seen often enough to judge: the long tail of one-off queries
+		// would pull every median to 0.
 		$ctrs = array();
 		$best = array();
 		foreach ( $rows as $r ) {
-			$top = max( $top, (float) $r['m'][ $at['impressions'] ] );
+			if ( (float) $r['m'][ $at['impressions'] ] < $floor ) {
+				continue;
+			}
 			$pos = (int) round( (float) $r['m'][ $at['position'] ] );
 			$ctr = (float) $r['m'][ $at['ctr'] ];
 			$ctrs[ $pos ][] = $ctr;
@@ -503,14 +511,18 @@ class Marsad_Connector_Search_Console extends Marsad_Connector {
 		}
 		$medians = array_map( array( __CLASS__, 'median' ), $ctrs );
 		$best    = $best ? self::median( $best ) : null;
-		$floor   = max( 50, 0.01 * $top );
 		$out     = array();
 		foreach ( $rows as $r ) {
 			$clicks = (float) $r['m'][ $at['clicks'] ];
 			$impr   = (float) $r['m'][ $at['impressions'] ];
 			$ctr    = (float) $r['m'][ $at['ctr'] ];
 			$pos    = (float) $r['m'][ $at['position'] ];
-			if ( $pos < 4 || $pos > 20 || $impr < $floor || $ctr >= $medians[ (int) round( $pos ) ] ) {
+			if ( $pos < 4 || $pos > 20 || $impr < $floor ) {
+				continue;
+			}
+			$median = $medians[ (int) round( $pos ) ] ?? 0.0;
+			// Below its peers; where peers get no clicks either, an unclicked query is still the opportunity.
+			if ( ! ( $ctr < $median || ( 0.0 === (float) $median && 0.0 === $clicks ) ) ) {
 				continue;
 			}
 			$out[] = array(

@@ -483,3 +483,19 @@ function test_sc_sitemaps_prefer_web_contents() {
 	same( array( 300, 280, 2, 0 ), $t['rows'][1]['m'], 'web entry, images do not inflate the page count' );
 	same( array(), Marsad_Connector_Search_Console::sitemaps( array() )['rows'] );
 }
+
+function test_opportunities_include_unclicked_queries_when_peers_are_also_unclicked() {
+	// Real shape seen on yementv.tv: most queries ranked 4–10 have no clicks, so the median CTR there is 0.
+	$rows = array(
+		array( 'd' => array( 'brand' ), 'm' => array( 400, 900, 0.44, 1.1 ) ),
+		array( 'd' => array( 'top3 b' ), 'm' => array( 30, 200, 0.15, 2.4 ) ),
+		array( 'd' => array( 'news a' ), 'm' => array( 0, 1200, 0.0, 6.2 ) ),
+		array( 'd' => array( 'news b' ), 'm' => array( 0, 300, 0.0, 6.4 ) ),
+		array( 'd' => array( 'news c' ), 'm' => array( 3, 600, 0.005, 5.9 ) ),
+		array( 'd' => array( 'tiny' ), 'm' => array( 0, 20, 0.0, 6.0 ) ),
+	);
+	$t = Marsad_Connector_Search_Console::opportunities( array( 'dims' => array( 'query' ), 'metrics' => array( 'clicks', 'impressions', 'ctr', 'position' ), 'rows' => $rows ) );
+	$names = array_map( function ( $r ) { return $r['d'][0]; }, $t['rows'] );
+	same( array( 'news a', 'news b' ), $names, 'unclicked, well-placed, enough impressions; sorted by impressions' );
+	check( $t['rows'][0]['m'][4] > 0, 'potential clicks estimated from positions 1–3' );
+}
