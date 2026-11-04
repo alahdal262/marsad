@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.6.1
+
+- The total in the middle of the channels donut is drawn left-to-right, so Arabic, Persian and Urdu screens no longer cut it at the ring.
+- Search Console tables say "5,000+" when Google stopped at the requested limit, instead of presenting the limit as the true count.
+
 ## 0.6.0
 
 - **Range snapshots**: for 7, 28, 90 and 365 days and all time, Marsad stores Google's own report of the period (deduplicated users, impression-weighted CTR and position, full tables, previous-period comparison), refreshed in the background with a shared time budget. Visitors now match Google Analytics (e.g. 5,132 active users for 28 days, where the daily average 209 was shown before).

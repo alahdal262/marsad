@@ -125,7 +125,8 @@ class Marsad_Admin_Infographics {
 			$svg .= '<circle cx="21" cy="21" r="15.9155" fill="none" stroke="' . esc_attr( self::COLORS[ $i % count( self::COLORS ) ] ) . '" stroke-width="6" stroke-dasharray="' . esc_attr( $len . ' ' . ( 100 - $len ) ) . '" stroke-dashoffset="' . esc_attr( round( $offset, 3 ) ) . '"><title>' . esc_html( $s[0] . ' ' . self::pct( $s[2] ) ) . '</title></circle>';
 			$offset -= $len;
 		}
-		$svg .= '<text x="21" y="21" text-anchor="middle" class="marsad-donut-num">' . esc_html( $total >= 1e4 ? Marsad_Svg::short( $total ) : number_format_i18n( round( $total ) ) ) . '</text>';
+		// direction="ltr": in an RTL page the anchor flips and "7,017" is cut at the ring's edge.
+		$svg .= '<text x="21" y="21" text-anchor="middle" direction="ltr" class="marsad-donut-num">' . esc_html( $total >= 1e4 ? Marsad_Svg::short( $total ) : number_format_i18n( round( $total ) ) ) . '</text>';
 		$svg .= '<text x="21" y="26.5" text-anchor="middle" class="marsad-donut-unit">' . esc_html( $unit ) . '</text></svg>';
 		echo '<div class="marsad-donut-box">' . $svg; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- built from escaped parts above.
 		self::legend( $shares );
