@@ -170,13 +170,6 @@
 .marsad-avatar { flex: 0 0 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; color: #fff; background: var(--c, var(--m-ink)); }
 .marsad-two .marsad-rank { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px 28px; }
 
-.marsad-funnel { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 12px; }
-.marsad-funnel li { display: flex; align-items: center; gap: 14px; font-size: 14px; }
-.marsad-funnel li > span:first-child { flex: 0 0 140px; }
-.marsad-funnel .marsad-track { flex: 1 1 auto; height: 28px; border-radius: 8px; }
-.marsad-funnel .marsad-track i { border-radius: 8px; }
-.marsad-funnel b { flex: 0 0 64px; text-align: end; font-size: 15px; }
-
 .marsad-stacked { display: flex; height: 14px; gap: 2px; border-radius: 999px; overflow: hidden; }
 .marsad-stacked i { flex-basis: 0; min-width: 4px; background: var(--c); }
 
@@ -239,10 +232,127 @@
 .marsad-forget label { color: var(--m-mute); font-size: 12px; }
 .marsad-copy { cursor: copy; user-select: all; }
 
+/* ── Shared bits for the deep reports ───────────────────────────── */
+.marsad-sr { position: absolute !important; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
+.marsad-btn-sm { min-height: 32px; padding: 0 12px; font-size: 13px; border-radius: 8px; }
+.marsad-note { color: var(--m-mute); font-size: 12px; }
+.marsad-warn-text { color: var(--m-warn); }
+.marsad-subhead { margin: 6px 0 0; font-size: 14px; }
+.marsad-snapnote { margin-block: -8px 16px; }
+.marsad-callout-warn { background: #fdf3e7; color: #7c2d12; }
+.marsad-cards-compact { grid-template-columns: repeat(auto-fill, minmax(min(100%, 180px), 1fr)); }
+.marsad-cards-compact .marsad-num { font-size: 26px; }
+.marsad-mini { display: flex; flex-wrap: wrap; gap: 4px 12px; margin-block-start: 6px; font-size: 12px; color: var(--m-mute); }
+.marsad-mini b { color: var(--m-ink); }
+.marsad-chip { display: inline-flex; align-items: center; justify-content: center; min-width: 30px; padding: 2px 6px; border-radius: 6px; background: var(--m-soft); color: var(--m-ink); font-size: 11px; font-weight: 700; letter-spacing: 0.04em; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+
+/* Key findings */
+.marsad-findings { margin: 0; padding: 0; list-style: none; display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr)); gap: 12px; }
+.marsad-finding { display: flex; gap: 12px; align-items: flex-start; padding: 14px 16px; border-radius: 12px; background: var(--m-ground); border-inline-start: 4px solid var(--m-faint); }
+.marsad-finding p { flex: 1 1 auto; margin: 0; font-size: 14px; line-height: 1.55; overflow-wrap: anywhere; }
+.marsad-finding a { flex: none; font-size: 13px; font-weight: 600; text-decoration: none; }
+.marsad-finding-icon { flex: none; width: 26px; height: 26px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 12px; background: #fff; color: var(--m-mute); }
+.marsad-finding-good { border-inline-start-color: var(--m-good); }
+.marsad-finding-good .marsad-finding-icon { color: var(--m-good); }
+.marsad-finding-bad { border-inline-start-color: var(--m-bad); }
+.marsad-finding-bad .marsad-finding-icon { color: var(--m-bad); }
+
+/* Platform cards */
+.marsad-platforms { margin-block-end: 24px; }
+.marsad-pcards { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 250px), 1fr)); gap: 16px; }
+.marsad-pcard { min-width: 0; display: flex; flex-direction: column; gap: 10px; padding: 18px; background: var(--m-bg); border: 1px solid var(--m-line); border-block-start: 4px solid var(--c, var(--m-accent)); border-radius: var(--m-radius); }
+.marsad-pcard header { display: flex; align-items: center; gap: 10px; }
+.marsad-pcard h4 { flex: 1 1 auto; min-width: 0; margin: 0; font-size: 15px; overflow-wrap: anywhere; }
+.marsad-badge { flex: none; width: 34px; height: 34px; border-radius: 10px; display: inline-flex; align-items: center; justify-content: center; background: var(--c, var(--m-ink)); color: #fff; font-weight: 700; font-size: 16px; }
+.marsad-pcard-main { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 10px; }
+.marsad-pcard-main .marsad-num { font-size: 30px; }
+.marsad-pcard-sub { margin: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.marsad-pcard-sub div { min-width: 0; }
+.marsad-pcard-sub dt { color: var(--m-mute); font-size: 12px; overflow-wrap: anywhere; }
+.marsad-pcard-sub dd { margin: 0; font-weight: 700; font-size: 15px; }
+.marsad-pcard-link { margin-block-start: auto; align-self: flex-start; font-size: 13px; font-weight: 600; text-decoration: none; }
+.marsad-pcard-bad { border-block-start-color: var(--m-bad); }
+.marsad-pcard-error { display: flex; flex-direction: column; gap: 4px; padding: 10px 12px; border-radius: 10px; background: #fdecec; color: #7f1d1d; font-size: 13px; overflow-wrap: anywhere; }
+.marsad-pcard-off { border-style: dashed; border-block-start: 1px dashed #b8c0cc; }
+.marsad-pcard-off li a { font-size: 13px; font-weight: 600; text-decoration: none; }
+
+/* Donut, split bars, countries */
+.marsad-donut-box { display: flex; flex-wrap: wrap; align-items: center; gap: 18px; }
+.marsad-donut-box .marsad-list { flex: 1 1 180px; min-width: 0; }
+.marsad-donut { flex: none; width: 150px; height: 150px; }
+.marsad-donut-num { font-size: 7px; font-weight: 700; fill: var(--m-ink); }
+.marsad-donut-unit { font-size: 3.2px; fill: var(--m-mute); }
+.marsad-split { display: flex; height: 26px; gap: 2px; border-radius: 8px; overflow: hidden; }
+.marsad-split i { flex-basis: 0; min-width: 4px; background: var(--c); color: #fff; font-style: normal; font-size: 11px; font-weight: 700; display: flex; align-items: center; justify-content: center; overflow: hidden; white-space: nowrap; }
+.marsad-keyed small { color: var(--m-mute); font-weight: 400; }
+.marsad-countries li { align-items: center; }
+
+/* Heatmap */
+.marsad-heat-scroll { overflow-x: auto; }
+.marsad-heat { display: grid; grid-template-columns: auto repeat(24, minmax(10px, 1fr)); gap: 2px; min-width: 300px; }
+.marsad-heat i { display: block; aspect-ratio: 1; border-radius: 3px; background: rgba(29, 78, 216, var(--a, 0)); }
+.marsad-heat-h, .marsad-heat-d { font-size: 11px; color: var(--m-mute); line-height: 1; }
+.marsad-heat-d { padding-inline-end: 6px; align-self: center; white-space: nowrap; }
+.marsad-heat-scale { display: flex; align-items: center; gap: 8px; margin: 0; font-size: 12px; color: var(--m-mute); }
+.marsad-heat-scale i { width: 90px; height: 8px; border-radius: 4px; background: linear-gradient(to right, rgba(29, 78, 216, 0.06), rgb(29, 78, 216)); }
+/* Gradients have no logical direction: in RTL "Fewer" comes first on the right. */
+.rtl .marsad-heat-scale i, [dir="rtl"] .marsad-heat-scale i { background: linear-gradient(to left, rgba(29, 78, 216, 0.06), rgb(29, 78, 216)); }
+
+/* Live visitors */
+.marsad-realtime header { position: relative; }
+.marsad-live { width: 10px; height: 10px; border-radius: 50%; background: #16a34a; box-shadow: 0 0 0 4px #dcfce7; align-self: center; }
+.marsad-rt-now { display: flex; align-items: baseline; gap: 10px; }
+.marsad-rt-now .marsad-num { font-size: 44px; }
+.marsad-rt-lists { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 160px), 1fr)); gap: 16px; }
+.marsad-rt-lists h4 { margin: 0 0 4px; font-size: 13px; color: var(--m-mute); }
+.marsad-rt-list li { padding: 6px 0; font-size: 13px; }
+.marsad-rt-list li span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: block; }
+
+/* Report tables */
+.marsad-table { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.marsad-table-tools { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; }
+.marsad-table-tools .marsad-sub { margin-inline-end: auto; }
+.marsad-filter { flex: 1 1 180px; max-width: 280px; min-height: 32px; border-radius: 8px; }
+.marsad-table-scroll { overflow-x: auto; max-width: 100%; }
+.marsad-tbl { width: 100%; border-collapse: collapse; font-size: 13px; }
+.marsad-tbl th, .marsad-tbl td { padding: 8px 10px; border-block-end: 1px solid var(--m-soft); text-align: start; vertical-align: top; }
+.marsad-tbl thead th { position: sticky; inset-block-start: 0; background: var(--m-bg); border-block-end-color: var(--m-line); white-space: nowrap; }
+.marsad-tbl .marsad-th-num, .marsad-td-num { text-align: end; white-space: nowrap; }
+.marsad-sort { all: unset; cursor: pointer; font-weight: 600; color: var(--m-mute); }
+.marsad-sort:hover { color: var(--m-ink); }
+.marsad-sort:focus-visible { outline: 2px solid var(--m-accent); outline-offset: 2px; border-radius: 4px; }
+.marsad-tbl th[aria-sort] .marsad-sort { color: var(--m-ink); }
+.marsad-tbl th[aria-sort="descending"] .marsad-sort::after { content: " ▼"; font-size: 10px; }
+.marsad-tbl th[aria-sort="ascending"] .marsad-sort::after { content: " ▲"; font-size: 10px; }
+.marsad-tbl tbody tr:hover { background: var(--m-ground); }
+.marsad-cell-text { display: block; max-width: 46ch; overflow-wrap: anywhere; text-decoration: none; }
+.marsad-cell-path { display: block; max-width: 46ch; color: var(--m-mute); font-size: 11px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+/* The path is left-to-right text, but lines up under its title on the start side. */
+.rtl .marsad-cell-path, [dir="rtl"] .marsad-cell-path { text-align: right; }
+.marsad-showall summary { cursor: pointer; font-weight: 600; font-size: 13px; color: var(--m-accent); padding-block: 4px; }
+.marsad-showall[open] summary { margin-block-end: 6px; }
+.marsad-more { align-self: flex-start; }
+.marsad-empty { margin: 0; }
+
 @media (max-width: 782px) {
 	.marsad-num { font-size: 26px; }
 	.marsad-two .marsad-rank { grid-template-columns: 1fr; }
-	.marsad-funnel li > span:first-child { flex-basis: 96px; }
 	.marsad-bars-y, .marsad-bars-plot { height: 160px; }
 	.marsad-panel { padding: 18px; }
+	.marsad-cols { gap: 16px; }
+	.marsad-donut-box { justify-content: center; }
+	.marsad-rt-now .marsad-num { font-size: 36px; }
+}
+
+/* Phones (390px): one column everywhere, nothing wider than the screen. */
+@media (max-width: 480px) {
+	.marsad-cards, .marsad-pcards, .marsad-findings { grid-template-columns: minmax(0, 1fr); }
+	.marsad-panel, .marsad-panel-wide, .marsad-stack { flex-basis: 100%; }
+	.marsad-panel { padding: 16px; }
+	.marsad-pcard-sub { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+	.marsad-finding { flex-wrap: wrap; }
+	.marsad-filter { max-width: none; }
+	.marsad-ranges { flex-wrap: wrap; }
+	.marsad-cell-text, .marsad-cell-path { max-width: 26ch; }
+	.marsad-tbl th, .marsad-tbl td { padding: 7px 6px; }
 }

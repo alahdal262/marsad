@@ -12,9 +12,10 @@ class Marsad_Admin {
 	public static function init() {
 		add_action( 'admin_menu', array( __CLASS__, 'menu' ) );
 		add_action( 'admin_enqueue_scripts', array( __CLASS__, 'assets' ) );
-		foreach ( array( 'save_connector', 'test_connector', 'sync_now', 'forget_connector', 'save_settings', 'check_update', 'google_connect', 'google_return', 'google_disconnect' ) as $a ) {
+		foreach ( array( 'save_connector', 'test_connector', 'sync_now', 'forget_connector', 'save_settings', 'check_update', 'google_connect', 'google_return', 'google_disconnect', 'export' ) as $a ) {
 			add_action( 'admin_post_marsad_' . $a, array( __CLASS__, 'handle_' . $a ) );
 		}
+		add_action( 'wp_ajax_marsad_realtime', array( __CLASS__, 'ajax_realtime' ) );
 		add_filter( 'plugin_action_links_' . plugin_basename( MARSAD_FILE ), array( __CLASS__, 'action_links' ) );
 	}
 
@@ -157,6 +158,101 @@ class Marsad_Admin {
 		}
 		self::notice( 'success', $c->label() . ': ' . __( 'disconnected.', 'marsad' ) );
 		self::back( 'connections' );
+	}
+
+	/* ── dashboard data ─────────────────────────────────────────────── */
+
+	/**
+	 * One stored report as a CSV download (GET admin-post.php?action=marsad_export&source=&range=&report=).
+	 * Anyone who may see the dashboard may take its tables away; the nonce stops a link
+	 * planted elsewhere from triggering downloads.
+	 */
+	public static function handle_export() {
+		self::guard( 'export', Marsad_Plugin::CAP_VIEW );
+		// phpcs:disable WordPress.Security.NonceVerification.Recommended -- verified in guard().
+		$source = sanitize_key( wp_unslash( $_GET['source'] ?? '' ) );
+		$range  = preg_replace( '/[^a-z0-9]/', '', (string) wp_unslash( $_GET['range'] ?? '' ) );
+		// Report keys keep their case (totals_googleNews), so sanitize_key() would break them.
+		$report = preg_replace( '/[^A-Za-z0-9_]/', '', (string) wp_unslash( $_GET['report'] ?? '' ) );
+		// phpcs:enable
+		$file = Marsad_Admin_Table::export( $source, $range, $report );
+		if ( ! $file ) {
+			wp_die( esc_html__( 'This report is not available. It may not have been fetched yet.', 'marsad' ), 404 );
+		}
+		nocache_headers();
+		header( 'Content-Type: text/csv; charset=utf-8' );
+		header( 'Content-Disposition: attachment; filename="' . $file['name'] . '"' );
+		header( 'X-Content-Type-Options: nosniff' );
+		echo $file['body']; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- a CSV file, not HTML.
+		exit;
+	}
+
+	/** Active users right now, for the dashboard's live card (polled every minute). */
+	public static function ajax_realtime() {
+		if ( ! current_user_can( Marsad_Plugin::CAP_VIEW ) ) {
+			wp_send_json_error( array( 'message' => __( 'You are not allowed to view statistics.', 'marsad' ) ), 403 );
+			return;
+		}
+		check_ajax_referer( 'marsad_realtime' );
+		$c    = Marsad_Registry::get( 'ga4' );
+		$data = null;
+		if ( $c && Marsad_Registry::is_enabled( $c ) && method_exists( $c, 'realtime' ) ) {
+			try {
+				$data = $c->realtime();
+			} catch ( Throwable $e ) {
+				$data = null;
+			}
+		}
+		if ( ! is_array( $data ) ) {
+			wp_send_json_error( array( 'message' => __( 'Live numbers are not available right now.', 'marsad' ) ) );
+			return;
+		}
+		wp_send_json_success( self::realtime_shape( $data ) );
+	}
+
+	/**
+	 * The live answer in one shape for the browser: active => int, pages/countries/devices =>
+	 * list of array( name, value ). Lists may arrive as a snapshot table, as name => value, or
+	 * as rows keyed by Google's dimension names.
+	 */
+	public static function realtime_shape( array $data ) {
+		return array(
+			'active'    => is_numeric( $data['active'] ?? null ) ? (int) round( $data['active'] ) : 0,
+			'pages'     => self::realtime_list( $data['pages'] ?? array() ),
+			'countries' => self::realtime_list( $data['countries'] ?? array() ),
+			'devices'   => self::realtime_list( $data['devices'] ?? array() ),
+		);
+	}
+
+	private static function realtime_list( $list ) {
+		if ( ! is_array( $list ) ) {
+			return array();
+		}
+		$out = array();
+		if ( isset( $list['rows'] ) && is_array( $list['rows'] ) ) {
+			foreach ( Marsad_Insights::rows_of( $list ) as $r ) {
+				$out[] = array( implode( ' · ', array_filter( $r['d'], 'strlen' ) ), array_values( $r['m'] )[0] ?? null );
+			}
+		} else {
+			foreach ( $list as $k => $v ) {
+				if ( is_string( $k ) && is_numeric( $v ) ) {
+					$out[] = array( $k, $v );
+				} elseif ( is_array( $v ) ) {
+					$name = $v['name'] ?? $v['dim'] ?? $v['label'] ?? $v['unifiedScreenName'] ?? $v['country'] ?? $v['deviceCategory'] ?? $v[0] ?? '';
+					$out[] = array( $name, $v['value'] ?? $v['users'] ?? $v['activeUsers'] ?? $v[1] ?? null );
+				}
+			}
+		}
+		$clean = array();
+		foreach ( $out as $row ) {
+			if ( is_scalar( $row[0] ) && '' !== trim( (string) $row[0] ) && is_numeric( $row[1] ) ) {
+				$clean[] = array(
+					'name'  => (string) $row[0],
+					'value' => (int) round( $row[1] ),
+				);
+			}
+		}
+		return array_slice( $clean, 0, 10 );
 	}
 
 	/* ── Connect with Google ─────────────────────────────────────────── */
