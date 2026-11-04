@@ -139,3 +139,12 @@ function test_each_role_card_decides_whether_it_sees_statistics() {
 	check( false !== strpos( $h, 'name="view_roles[]" value="author"' ) && false === strpos( $h, 'name="view_roles[]" value="author" checked' ) );
 	same( 1, substr_count( $h, 'name="view_roles[]" value="editor"' ), 'one switch per role, not two lists that can disagree' );
 }
+
+function test_overview_links_only_to_tabs_the_role_may_see() {
+	marsad_test_deep_site();
+	Marsad_Plugin::save_settings( array( 'view_roles' => array( 'editor' ), 'role_tabs' => array( 'editor' => array( 'overview', 'audience', 'content', 'search', 'platforms' ) ) ) );
+	marsad_test_as( array( 'editor' ), array( 'marsad_view' ) );
+	$h = marsad_test_render_tab( 'overview' );
+	check( false !== strpos( $h, 'Every platform at a glance' ), 'overview rendered' );
+	check( false === strpos( $h, 'tab=hosting' ), 'no card, finding or "All" link points at the hidden Hosting tab' );
+}

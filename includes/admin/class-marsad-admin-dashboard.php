@@ -198,6 +198,9 @@ class Marsad_Admin_Dashboard {
 		foreach ( $list as $f ) {
 			$tone = isset( $tones[ $f['tone'] ] ) ? $f['tone'] : 'neutral';
 			$tab  = isset( $tabs[ $f['tab'] ] ) ? $f['tab'] : 'overview';
+			if ( ! self::tab_ok( $tab ) ) {
+				continue; // A finding about a section this role does not see.
+			}
 			$url  = Marsad_Admin::url( '', array( 'tab' => $tab, 'range' => self::$report->key() ) ) . ( '' !== $f['anchor'] ? '#marsad-' . $f['anchor'] : '' );
 			echo '<li class="marsad-finding marsad-finding-' . esc_attr( $tone ) . '"><span class="marsad-finding-icon" aria-hidden="true">' . esc_html( $tones[ $tone ][0] ) . '</span>';
 			echo '<p><span class="marsad-sr">' . esc_html( $tones[ $tone ][1] ) . ' </span>' . esc_html( $f['text'] ) . '</p>';
@@ -213,6 +216,9 @@ class Marsad_Admin_Dashboard {
 		echo '<section class="marsad-platforms" aria-labelledby="marsad-platforms-h"><div class="marsad-titlebar"><h3 id="marsad-platforms-h">' . esc_html__( 'Every platform at a glance', 'marsad' ) . '</h3></div>';
 		echo '<div class="marsad-pcards">';
 		foreach ( $sections as $i => $s ) {
+			if ( ! self::tab_ok( self::source_tab( $s['connector']->id() ) ) ) {
+				continue; // e.g. Site & hosting for a role without the Hosting tab.
+			}
 			self::platform_card( $s, $status[ $s['connector']->id() ] ?? array(), Marsad_Admin_Infographics::COLORS[ $i % count( Marsad_Admin_Infographics::COLORS ) ] );
 		}
 		$off    = array_filter(
@@ -1160,7 +1166,15 @@ class Marsad_Admin_Dashboard {
 		return empty( $st['ok'] ) ? array( 'bad', __( 'Error', 'marsad' ) ) : array( 'ok', __( 'Working', 'marsad' ) );
 	}
 
+	/** Whether the current user may open a dashboard tab. */
+	private static function tab_ok( $tab ) {
+		return in_array( $tab, Marsad_Plugin::allowed_tabs(), true );
+	}
+
 	private static function tab_link( $tab, $label ) {
+		if ( ! self::tab_ok( $tab ) ) {
+			return '';
+		}
 		return '<a href="' . esc_url( Marsad_Admin::url( '', array( 'tab' => $tab, 'range' => self::$report->key() ) ) ) . '">' . esc_html( $label ) . '</a>';
 	}
 

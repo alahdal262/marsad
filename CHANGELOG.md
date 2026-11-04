@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.7.3
+
+- Overview shows only what a role may see: no platform card, finding or "All" link that leads to a hidden section (the Site & hosting card stayed visible to roles without the Hosting tab).
+
 ## 0.7.2
 
 - Settings: whether a role sees the statistics is now the first switch in that role's card, next to its sections and platforms. The separate list at the top could disagree with the cards: a role given sections there still saw nothing.

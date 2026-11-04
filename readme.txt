@@ -4,7 +4,7 @@ Tags: analytics, statistics, dashboard, google analytics, social media
 Requires at least: 6.5
 Tested up to: 6.8
 Requires PHP: 7.4
-Stable tag: 0.7.2
+Stable tag: 0.7.3
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -47,6 +47,9 @@ Administrators by default. Choose more roles under Marsad → Settings.
 Hourly by default, through WP-Cron. Use "Sync now" on the dashboard to refresh immediately.
 
 == Changelog ==
+
+= 0.7.3 =
+* Overview hides cards, findings and links of sections a role may not see.
 
 = 0.7.2 =
 * Settings: "Can see the statistics" sits in each role's card, next to its sections and platforms.
