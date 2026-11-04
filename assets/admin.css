@@ -314,7 +314,9 @@
 .marsad-table-tools .marsad-sub { margin-inline-end: auto; }
 .marsad-filter { flex: 1 1 180px; max-width: 280px; min-height: 32px; border-radius: 8px; }
 .marsad-table-scroll { overflow-x: auto; max-width: 100%; }
-.marsad-tbl { width: 100%; border-collapse: collapse; font-size: 13px; }
+.marsad-tbl { width: 100%; min-width: 30rem; border-collapse: collapse; font-size: 13px; }
+/* A panel holding a table needs room: two per row at most, never squeezed until words break. */
+.marsad-panel:has(.marsad-tbl) { flex-basis: 520px; }
 .marsad-tbl th, .marsad-tbl td { padding: 8px 10px; border-block-end: 1px solid var(--m-soft); text-align: start; vertical-align: top; }
 .marsad-tbl thead th { position: sticky; inset-block-start: 0; background: var(--m-bg); border-block-end-color: var(--m-line); white-space: nowrap; }
 .marsad-tbl .marsad-th-num, .marsad-td-num { text-align: end; white-space: nowrap; }
@@ -325,7 +327,7 @@
 .marsad-tbl th[aria-sort="descending"] .marsad-sort::after { content: " ▼"; font-size: 10px; }
 .marsad-tbl th[aria-sort="ascending"] .marsad-sort::after { content: " ▲"; font-size: 10px; }
 .marsad-tbl tbody tr:hover { background: var(--m-ground); }
-.marsad-cell-text { display: block; max-width: 46ch; overflow-wrap: anywhere; text-decoration: none; }
+.marsad-cell-text { display: block; min-width: 9rem; max-width: 46ch; overflow-wrap: break-word; text-decoration: none; }
 .marsad-cell-path { display: block; max-width: 46ch; color: var(--m-mute); font-size: 11px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 /* The path is left-to-right text, but lines up under its title on the start side. */
 .rtl .marsad-cell-path, [dir="rtl"] .marsad-cell-path { text-align: right; }
