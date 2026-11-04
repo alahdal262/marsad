@@ -37,6 +37,7 @@ LINE = re.compile(
     r'"(?P<referer>[^"]*)" "(?P<ua>[^"]*)"(?: "(?P<xff>[^"]*)")?'
 )
 CLIENT = re.compile(r'^(?P<ip>\S+) ')
+SEGMENT = re.compile(r'\.(ts|m4s|aac|mp4|cmfv|cmfa)(\?|$)', re.I)
 
 BOTS = re.compile(r'bot|crawl|spider|slurp|facebookexternalhit|preview|monitor|uptime|pingdom|headless', re.I)
 TOOLS = re.compile(
@@ -110,6 +111,9 @@ def update(state, lines, prefix, own_hosts, last_ts):
     for line in lines:
         m = LINE.search(line)
         if not m or not m.group('path').startswith(prefix) or m.group('status') not in ('200', '206'):
+            continue
+        # Only media segments mean watching; a playlist alone is a check (monitors, link previews).
+        if not SEGMENT.search(m.group('path')):
             continue
         try:
             t = parse_time(m.group('time'))

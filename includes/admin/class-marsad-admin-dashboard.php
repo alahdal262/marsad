@@ -1090,8 +1090,12 @@ class Marsad_Admin_Dashboard {
 
 		if ( $s['tables'] ) {
 			echo '<div class="marsad-cols">';
-			foreach ( $s['tables'] as $t ) {
+			foreach ( $s['tables'] as $key => $t ) {
 				echo '<div class="marsad-subpanel"><h4>' . esc_html( $t['label'] ) . '</h4>';
+				foreach ( $t['rows'] as &$row ) {
+					$row['dim'] = $c->dim_label( $key, $row['dim'] );
+				}
+				unset( $row );
 				self::ranked( $t['rows'], ! empty( $t['link'] ) );
 				echo '</div>';
 			}

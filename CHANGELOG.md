@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.7.1
+
+- Live stream platforms are stored as keys and named in each admin's own language when shown (they were stored in the site's language at push time).
+- The collector counts a viewer only when media segments are downloaded: playlist-only requests (health checks, link previews) are not watching.
+
 ## 0.7.0
 
 - **Live stream**: a collector for the streaming server (`server/stream`, Python, systemd timer) counts who watches the HLS stream and on what — website, live player page, iPhone and Android apps, Samsung/LG/Fire/Roku/Apple/Android TVs, IPTV players, other sites playing the stream, re-broadcasting tools — and pushes counts only (no IPs) to `/wp-json/marsad/v1/push/stream`. Viewers a day, hours watched, peak viewers at once, and "watching now".

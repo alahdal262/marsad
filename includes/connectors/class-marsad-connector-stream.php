@@ -75,6 +75,10 @@ class Marsad_Connector_Stream extends Marsad_Connector {
 		);
 	}
 
+	public function dim_label( $table, $dim ) {
+		return 'viewers_by_platform' === $table ? ( self::platforms()[ $dim ] ?? $dim ) : $dim;
+	}
+
 	/** Readable names of the collector's platform keys. */
 	public static function platforms() {
 		return array(
@@ -135,7 +139,6 @@ class Marsad_Connector_Stream extends Marsad_Connector {
 		if ( ! is_array( $data ) || ! is_array( $data['days'] ?? null ) ) {
 			return array( 'code' => 400, 'message' => 'Expected {"days": {...}}.' );
 		}
-		$names = self::platforms();
 		$rows  = array();
 		$count = function ( $v ) {
 			return is_numeric( $v ) && $v >= 0 && $v < 1e9 ? (float) $v : null;
@@ -157,7 +160,8 @@ class Marsad_Connector_Stream extends Marsad_Connector {
 					if ( null === $v || '' === (string) $name ) {
 						continue;
 					}
-					$dim    = 'platforms' === $key ? ( $names[ $name ] ?? sanitize_text_field( (string) $name ) ) : sanitize_text_field( (string) $name );
+					// Platform keys stay keys: each admin sees them in their own language (dim_label()).
+					$dim    = sanitize_text_field( (string) $name );
 					$rows[] = array( 'metric' => $metric, 'dim' => mb_substr( $dim, 0, 120 ), 'day' => $day, 'value' => $v );
 				}
 			}
@@ -169,7 +173,7 @@ class Marsad_Connector_Stream extends Marsad_Connector {
 			$platforms = array();
 			foreach ( (array) ( $data['now']['platforms'] ?? array() ) as $name => $v ) {
 				if ( null !== $count( $v ) ) {
-					$platforms[ $names[ $name ] ?? sanitize_text_field( (string) $name ) ] = (int) $v;
+					$platforms[ sanitize_text_field( (string) $name ) ] = (int) $v;
 				}
 			}
 			update_option( self::OPT_NOW, array( 'viewers' => (int) $count( $data['now']['viewers'] ?? 0 ), 'platforms' => $platforms, 'at' => time() ), false );

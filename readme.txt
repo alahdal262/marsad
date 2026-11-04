@@ -4,7 +4,7 @@ Tags: analytics, statistics, dashboard, google analytics, social media
 Requires at least: 6.5
 Tested up to: 6.8
 Requires PHP: 7.4
-Stable tag: 0.7.0
+Stable tag: 0.7.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -47,6 +47,9 @@ Administrators by default. Choose more roles under Marsad → Settings.
 Hourly by default, through WP-Cron. Use "Sync now" on the dashboard to refresh immediately.
 
 == Changelog ==
+
+= 0.7.1 =
+* Live stream: platforms shown in each admin's language; only people who actually watch are counted.
 
 = 0.7.0 =
 * Live stream viewers by platform, choices per role (sections seen, platforms they may connect), X, Threads and TikTok.

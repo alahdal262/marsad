@@ -90,3 +90,17 @@ class Counting(unittest.TestCase):
 
 if __name__ == '__main__':
     unittest.main()
+
+
+class OnlyWatchersCount(unittest.TestCase):
+    def test_playlist_only_clients_are_not_viewers(self):
+        state = {'last_ts': 0, 'days': {}}
+        lines = [
+            line('curl/8.5', path='/memfs/x.m3u8?ytvcheck=1', ip='5.5.5.5'),
+            line('curl/8.5', path='/memfs/x_output_0_video.m3u8?session=a', ip='5.5.5.5'),
+            line('Lavf/60', path='/memfs/x_output_0_video_10.ts?session=b', ip='6.6.6.6'),
+        ]
+        ms.update(state, lines, '/memfs/', OWN, 0)
+        s = ms.summary(state['days']['2026-11-04'])
+        self.assertEqual(s['viewers'], 1, 'checking the playlist is not watching')
+        self.assertEqual(s['tools'], {'Lavf': 1})

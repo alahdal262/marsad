@@ -42,7 +42,7 @@ function test_push_stores_daily_counts_and_now() {
 	same( 200, $r['code'] );
 	$sql = implode( "\n", $GLOBALS['wpdb']->queries );
 	check( false !== strpos( $sql, "'stream','viewers'" ) && false !== strpos( $sql, "'stream','watch_hours'" ) && false !== strpos( $sql, "'stream','peak'" ), 'daily totals stored' );
-	check( false !== strpos( $sql, "'stream','viewers_by_platform','iPhone app'" ), 'platforms stored with readable names' );
+	check( false !== strpos( $sql, "'stream','viewers_by_platform','app_ios'" ), 'platforms stored by key' );
 	check( false !== strpos( $sql, "'stream','restreamers','Lavf'" ) );
 	check( false !== strpos( $sql, "'stream','viewers_by_site','other.example'" ) );
 	$now = Marsad_Connector_Stream::now();
@@ -70,4 +70,13 @@ function test_stream_sync_reports_a_silent_collector() {
 	throws( function () use ( $c ) { $c->fetch( 'a', 'b' ); }, 'stopped sending' );
 	update_option( Marsad_Connector_Stream::OPT_LAST, time() - 60 );
 	same( array(), $c->fetch( 'a', 'b' ) );
+}
+
+function test_platform_names_are_stored_as_keys_and_translated_when_shown() {
+	$token = marsad_stream_enable();
+	Marsad_Connector_Stream::receive( 'Bearer ' . $token, marsad_stream_payload() );
+	$sql = implode( "\n", $GLOBALS['wpdb']->queries );
+	check( false !== strpos( $sql, "'stream','viewers_by_platform','app_ios'" ), 'stored as a key, not in the language of whoever pushed' );
+	same( 'iPhone app', Marsad_Registry::get( 'stream' )->dim_label( 'viewers_by_platform', 'app_ios' ) );
+	same( 'Lavf', Marsad_Registry::get( 'stream' )->dim_label( 'restreamers', 'Lavf' ) );
 }

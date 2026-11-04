@@ -134,6 +134,11 @@ abstract class Marsad_Connector {
 		return isset( $this->values[ $key ] ) && '' !== $this->values[ $key ] ? $this->values[ $key ] : $default;
 	}
 
+	/** How a breakdown value is shown; a source storing codes turns them into words here. */
+	public function dim_label( $table, $dim ) {
+		return $dim;
+	}
+
 	/**
 	 * One setup step with a button that opens the exact page it talks about.
 	 */
