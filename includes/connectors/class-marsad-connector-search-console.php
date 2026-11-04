@@ -208,7 +208,8 @@ class Marsad_Connector_Search_Console extends Marsad_Connector {
 			}
 		);
 		$tables = array(
-			'pages'      => array( 'page', self::WIDE, 500 ),
+			// Only 500 pages are kept; 5,000 still finds their previous values without a 25,000-row answer in memory.
+			'pages'      => array( 'page', 5000, 500 ),
 			'countries'  => array( 'country', 250, 250 ),
 			'devices'    => array( 'device', 10, 10 ),
 			'appearance' => array( 'searchAppearance', 100, 100 ),
@@ -330,6 +331,10 @@ class Marsad_Connector_Search_Console extends Marsad_Connector {
 	 */
 	private function pair( $base, array $auth, array $range, array $dims, $limit ) {
 		$cur = self::parse_rows( $this->query( $base, $auth, $range['from'], $range['to'], $dims, 'web', $limit ), $dims );
+		if ( count( $cur['rows'] ) >= $limit ) {
+			// Google stopped at the limit: there are more rows than it returned, so the count is a floor.
+			$cur['total_more'] = true;
+		}
 		if ( ! self::has_previous( $range ) ) {
 			return array( $cur, null );
 		}

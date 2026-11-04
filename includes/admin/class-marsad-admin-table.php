@@ -165,7 +165,7 @@ class Marsad_Admin_Table {
 		echo '<input type="search" class="marsad-filter" hidden placeholder="' . esc_attr__( 'Filter rows', 'marsad' ) . '" aria-label="' . esc_attr( sprintf( /* translators: %s: table name */ __( 'Filter rows of %s', 'marsad' ), $name ) ) . '">';
 		if ( $total > $count ) {
 			/* translators: 1: rows shown, 2: rows Google has */
-			$note = sprintf( __( 'Top %1$s of %2$s', 'marsad' ), number_format_i18n( $count ), number_format_i18n( $total ) );
+			$note = sprintf( __( 'Top %1$s of %2$s', 'marsad' ), number_format_i18n( $count ), number_format_i18n( $total ) . ( empty( $payload['total_more'] ) ? '' : '+' ) );
 		} else {
 			/* translators: %s: number of rows */
 			$note = sprintf( _n( '%s row', '%s rows', $count, 'marsad' ), number_format_i18n( $count ) );
@@ -231,14 +231,24 @@ class Marsad_Admin_Table {
 		if ( $change ) {
 			$pct = Marsad_Aggregate::change( $r['m'][ $change ] ?? null, $r['p'][ $change ] ?? null );
 			echo '<td class="marsad-td-num" data-v="' . esc_attr( null === $pct ? '' : round( $pct, 2 ) ) . '">';
-			if ( null === $pct && null !== ( $r['m'][ $change ] ?? null ) && ! ( $r['p'][ $change ] ?? null ) ) {
-				echo '<span class="marsad-change marsad-good">' . esc_html__( 'New', 'marsad' ) . '</span>';
-			} else {
-				echo Marsad_Admin::change_badge( $pct, self::better( $change ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escaped in change_badge().
-			}
+			echo self::change_cell( $r['m'][ $change ] ?? null, $r['p'][ $change ] ?? null, self::better( $change ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escaped inside.
 			echo '</td>';
 		}
 		echo '</tr>';
+	}
+
+	/**
+	 * The change badge of one row. "New" only when the previous period really had zero; an unknown
+	 * previous value (Google cut its answer short) is a dash, and zero both times shows nothing.
+	 */
+	public static function change_cell( $now, $before, $better ) {
+		if ( is_numeric( $before ) && 0.0 === (float) $before ) {
+			return ( is_numeric( $now ) && (float) $now > 0 ) ? '<span class="marsad-change marsad-good">' . esc_html__( 'New', 'marsad' ) . '</span>' : '';
+		}
+		if ( null === $before || null === $now ) {
+			return '<span class="marsad-flat" title="' . esc_attr__( 'Not known for the previous period', 'marsad' ) . '">—</span>';
+		}
+		return Marsad_Admin::change_badge( Marsad_Aggregate::change( $now, $before ), $better );
 	}
 
 	/** One dimension value as escaped markup: a link, a country chip or text. */
@@ -324,7 +334,7 @@ class Marsad_Admin_Table {
 			$lines[] = array( __( 'Metric', 'marsad' ), __( 'Value', 'marsad' ), __( 'Previous period', 'marsad' ) );
 			foreach ( $payload['metrics'] as $key => $m ) {
 				$f       = self::format_of( $c, (string) $key, false );
-				$lines[] = array( self::safe( self::csv_label( $c, (string) $key, $f ) ), self::csv_num( $m['value'] ?? null, $f ), self::csv_num( $m['prev'] ?? null, $f ) );
+				$lines[] = array( self::csv_label( $c, (string) $key, $f ), self::csv_num( $m['value'] ?? null, $f ), self::csv_num( $m['prev'] ?? null, $f ) );
 			}
 		} else {
 			$t    = self::normalize( $payload );
@@ -339,20 +349,20 @@ class Marsad_Admin_Table {
 			}
 			$head = array();
 			foreach ( $t['dims'] as $d ) {
-				$head[] = self::safe( self::label( $c, $d ) );
+				$head[] = self::label( $c, $d );
 			}
 			foreach ( $t['metrics'] as $m ) {
-				$head[] = self::safe( self::csv_label( $c, $m, self::format_of( $c, $m, false ) ) );
+				$head[] = self::csv_label( $c, $m, self::format_of( $c, $m, false ) );
 			}
 			foreach ( $prev as $m ) {
 				/* translators: %s: column name */
-				$head[] = self::safe( sprintf( __( '%s, previous period', 'marsad' ), self::csv_label( $c, $m, self::format_of( $c, $m, false ) ) ) );
+				$head[] = sprintf( __( '%s, previous period', 'marsad' ), self::csv_label( $c, $m, self::format_of( $c, $m, false ) ) );
 			}
 			$lines[] = $head;
 			foreach ( $t['rows'] as $r ) {
 				$line = array();
 				foreach ( array_keys( $t['dims'] ) as $i ) {
-					$line[] = self::safe( $r['d'][ $i ] ?? '' );
+					$line[] = (string) ( $r['d'][ $i ] ?? '' );
 				}
 				foreach ( $t['metrics'] as $m ) {
 					$line[] = self::csv_num( $r['m'][ $m ], self::format_of( $c, $m, false ) );
@@ -363,14 +373,8 @@ class Marsad_Admin_Table {
 				$lines[] = $line;
 			}
 		}
-		$h = fopen( 'php://temp', 'r+' );
-		foreach ( $lines as $line ) {
-			fputcsv( $h, $line, ',', '"', '' );
-		}
-		rewind( $h );
-		$out = stream_get_contents( $h );
-		fclose( $h );
-		return (string) $out;
+		// csv_line() quotes every field and neutralises formulas in text, headers included.
+		return implode( '', array_map( array( __CLASS__, 'csv_line' ), $lines ) );
 	}
 
 	/** Ratios become percentages in the file too, and say so in their header. */
@@ -385,9 +389,30 @@ class Marsad_Admin_Table {
 		return 'percent' === $format ? (string) round( $v * 100, 2 ) : (string) round( (float) $v, 4 );
 	}
 
-	/** A cell starting with = + - @ would run as a formula in a spreadsheet; a quote keeps it text. */
+	/**
+	 * A text cell that could run as a formula in a spreadsheet, also after a separator another locale
+	 * uses (Excel splits on ";" in many countries), gets a leading quote so it stays text.
+	 */
 	private static function safe( $s ) {
 		$s = (string) $s;
-		return ( '' !== $s && false !== strpos( "=+-@\t\r", $s[0] ) ) ? "'" . $s : $s;
+		if ( ( '' !== $s && false !== strpos( "=+-@\t\r", $s[0] ) ) || preg_match( '/[;,\t]\s*[=+\-@]/', $s ) ) {
+			$s = "'" . str_replace( ';', ',', $s );
+		}
+		return $s;
+	}
+
+	/** One CSV line with every field quoted, so a separator inside a value never splits it. */
+	public static function csv_line( array $fields ) {
+		return implode(
+			',',
+			array_map(
+				function ( $f ) {
+					// Numbers (negative ones included) stay numbers; only text can hide a formula.
+					$f = is_numeric( $f ) ? (string) $f : self::safe( $f );
+					return '"' . str_replace( '"', '""', $f ) . '"';
+				},
+				$fields
+			)
+		) . "\r\n";
 	}
 }

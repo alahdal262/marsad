@@ -99,6 +99,7 @@ class Marsad_Registry {
 	public static function save( Marsad_Connector $c, $enabled, array $submitted ) {
 		$saved = self::saved();
 		$prev  = $saved[ $c->id() ]['values'] ?? array();
+		$was   = self::decrypt_values( $c, $prev );
 		$vals  = array();
 		foreach ( $c->fields() as $key => $f ) {
 			$type = $f['type'] ?? 'text';
@@ -119,6 +120,10 @@ class Marsad_Registry {
 		);
 		update_option( self::OPT, $saved, false );
 		self::$cache = null;
+		// Another property, site or key means other numbers: the old range reports must not show.
+		if ( $c->supports_snapshots() && $was !== self::decrypt_values( $c, $vals ) && array_filter( $was ) ) {
+			Marsad_Snapshots::delete_source( $c->id() );
+		}
 	}
 
 	/**

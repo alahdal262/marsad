@@ -4,7 +4,7 @@ Tags: analytics, statistics, dashboard, google analytics, social media
 Requires at least: 6.5
 Tested up to: 6.8
 Requires PHP: 7.4
-Stable tag: 0.5.2
+Stable tag: 0.6.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -45,6 +45,9 @@ Administrators by default. Choose more roles under Marsad → Settings.
 Hourly by default, through WP-Cron. Use "Sync now" on the dashboard to refresh immediately.
 
 == Changelog ==
+
+= 0.6.0 =
+* Deep Google Analytics and Search Console: Google's own report for each period, full tables, comparisons, realtime, findings, CSV export, an infographic overview, and Audience and Search tabs.
 
 = 0.5.2 =
 * Google Play explains exactly which Play Console permission to grant when reports are not readable yet.

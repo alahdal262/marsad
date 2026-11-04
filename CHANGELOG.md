@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.6.0
+
+- **Range snapshots**: for 7, 28, 90 and 365 days and all time, Marsad stores Google's own report of the period (deduplicated users, impression-weighted CTR and position, full tables, previous-period comparison), refreshed in the background with a shared time budget. Visitors now match Google Analytics (e.g. 5,132 active users for 28 days, where the daily average 209 was shown before).
+- **Google Analytics 4**: 29 reports: totals, pages, landing pages, channels, source/medium, campaigns, social, referrals, countries, cities, languages, devices, OS, browsers, models, resolutions, new vs returning, age, gender, an hour-by-day heatmap, events, key events, site search terms, outbound links, and the Site Kit dimensions (authors, publish dates, scroll depth, video). Live visitors refresh every minute.
+- **Search Console**: web, image, video, news, Discover and Google News totals; up to 1,000 queries and 500 pages with previous values; countries, devices, search appearance, query→page; opportunities with estimated extra clicks; rising and falling queries; sitemaps.
+- **Overview**: headline numbers from Google's reports, key findings in plain sentences, one card per platform, channels donut, devices, top countries, new vs returning and search-type splits.
+- **Tables**: sortable, filterable, "show all", change column, CSV export that Excel opens correctly (formulas neutralised).
+- Hardening from an independent review: honest comparisons when the previous period is not kept, ranges that crash the host are retried last and reported, lower memory, refresh on every hourly run, old property data dropped when the property changes, failed saves reported.
+- Translations for all 15 languages.
+
 ## 0.5.2
 
 - Google Play: a 403 from the reports bucket now names the account and the exact Play Console permission to grant ("View app information and download bulk reports"), in every language, instead of the raw storage error.

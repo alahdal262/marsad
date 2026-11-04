@@ -201,7 +201,15 @@ class Marsad_Insights {
 	}
 
 	private static function new_share() {
-		$share = self::share( 'ga4', 'new_returning', 'activeUsers', 'new' );
+		// From the deduplicated totals: a returning user can also be counted in the "new" row.
+		$new    = self::$snaps['ga4']['totals']['metrics']['newUsers']['value'] ?? null;
+		$active = self::$snaps['ga4']['totals']['metrics']['activeUsers']['value'] ?? null;
+		if ( is_numeric( $new ) && is_numeric( $active ) && (float) $active > 0 ) {
+			$share = min( 1, (float) $new / (float) $active );
+		} else {
+			// Older snapshots without newUsers: the split of the new/returning rows is the best there is.
+			$share = self::share( 'ga4', 'new_returning', 'activeUsers', 'new' );
+		}
 		if ( null === $share ) {
 			return null;
 		}

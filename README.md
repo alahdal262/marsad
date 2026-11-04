@@ -47,7 +47,7 @@ Secrets are encrypted at rest (AES-256-GCM, keyed from your `wp-config.php` salt
 - WP-Cron runs a sync hourly (configurable). The first sync of a source imports up to 90 days of history (configurable, capped per source); later syncs refresh the last few days, because most platforms revise recent numbers.
 - Data lives in one table, `{prefix}marsad_metrics`, one row per source, metric, dimension and day. Old rows are purged after the retention period (default 730 days).
 - Every setup step links straight to the page where you get what it asks for.
-- The dashboard has four tabs: **Overview**, **Content & users**, **Platforms & apps** and **Hosting**. It compares each period with the one before it. Charts are server-rendered SVG, so the page loads no external scripts.
+- The dashboard has six tabs: **Overview**, **Audience**, **Content & users**, **Search**, **Platforms & apps** and **Hosting**. Google Analytics and Search Console numbers for each period come from Google's own report of that period (range snapshots), so they match Google's interfaces. It compares each period with the one before it. Charts are server-rendered SVG, so the page loads no external scripts.
 - Who can see the dashboard is set under **Marsad → Settings**. Only administrators can manage connections.
 
 ## Languages

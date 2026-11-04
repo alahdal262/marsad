@@ -238,8 +238,10 @@ function test_snapshot_stale_by_ttl() {
 	check( Marsad_Snapshots::stale( 'ga4', '7', 3600 ), 'other reports do not count' );
 	Marsad_Snapshots::put( 'ga4', '7', 'totals', array( 'metrics' => array() ) );
 	check( ! Marsad_Snapshots::stale( 'ga4', '7', 3600 ), 'fresh' );
-	$db->age( 'ga4', '7', 'totals', 3500 );
+	$db->age( 'ga4', '7', 'totals', 3000 );
 	check( ! Marsad_Snapshots::stale( 'ga4', '7', 3600 ), 'within the TTL' );
+	$db->age( 'ga4', '7', 'totals', 3400 );
+	check( Marsad_Snapshots::stale( 'ga4', '7', 3600 ), 'due within the margin, so an hourly run never skips it' );
 	$db->age( 'ga4', '7', 'totals', 3700 );
 	check( Marsad_Snapshots::stale( 'ga4', '7', 3600 ), 'older than the TTL' );
 	same( array( '7' => 3600, '28' => 10800, '90' => 43200, '365' => 86400, 'all' => 86400 ), Marsad_Snapshots::TTL );

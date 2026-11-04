@@ -18,6 +18,10 @@ defined( 'ABSPATH' ) || exit;
 class Marsad_Snapshots {
 
 	const RANGES     = array( '7', '28', '90', '365', 'all' );
+	/** Option: source => range => time a refresh started and has not returned yet. */
+	const OPT_ATTEMPTS = 'marsad_snapshot_attempts';
+	/** Seconds a range may be early and still count as due, so hourly runs never skip one. */
+	const MARGIN = 300;
 	const OPT_ERRORS = 'marsad_snapshot_errors';
 
 	/** Seconds a range stays fresh: short ranges move fastest, so they are refreshed most often. */
@@ -86,7 +90,11 @@ class Marsad_Snapshots {
 		$table = self::table();
 		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name is built here.
 		$sql = "INSERT INTO {$table} (source,range_key,report,payload,fetched_at) VALUES (%s,%s,%s,%s,%s) ON DUPLICATE KEY UPDATE payload=VALUES(payload), fetched_at=VALUES(fetched_at)";
-		$wpdb->query( $wpdb->prepare( $sql, (string) $source, (string) $range_key, mb_substr( (string) $report, 0, 80 ), $json, current_time( 'mysql', true ) ) ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+		$ok  = $wpdb->query( $wpdb->prepare( $sql, (string) $source, (string) $range_key, mb_substr( (string) $report, 0, 80 ), $json, current_time( 'mysql', true ) ) ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+		if ( false === $ok ) {
+			// A missing table or a packet too large must show up against the range, not pass as written.
+			throw new Marsad_Exception( (string) $wpdb->last_error );
+		}
 	}
 
 	/**
@@ -142,7 +150,14 @@ class Marsad_Snapshots {
 		$today     = $today ? (string) $today : gmdate( 'Y-m-d' );
 		$range_key = in_array( (string) $range_key, self::RANGES, true ) ? (string) $range_key : '28';
 		if ( 'all' !== $range_key ) {
-			return Marsad_Aggregate::range( (int) $range_key, $today );
+			$r = Marsad_Aggregate::range( (int) $range_key, $today );
+			// A previous period reaching before the first day the source keeps (Search Console: 16
+			// months) would compare a full year with a few months: show no change rather than a false one.
+			if ( $start && $r['prev_from'] < (string) $start ) {
+				$r['prev_from'] = null;
+				$r['prev_to']   = null;
+			}
+			return $r;
 		}
 		$to = Marsad_Aggregate::range( 1, $today )['to'];
 		return array(
@@ -156,7 +171,7 @@ class Marsad_Snapshots {
 	/** True when the range's 'totals' report is missing or older than $ttl seconds. */
 	public static function stale( $source, $range_key, $ttl ): bool {
 		$got = self::get( $source, $range_key, 'totals' );
-		return null === $got || time() - $got['fetched_at'] >= (int) $ttl;
+		return null === $got || time() - $got['fetched_at'] >= (int) $ttl - self::MARGIN;
 	}
 
 	/**
@@ -167,13 +182,22 @@ class Marsad_Snapshots {
 	 * @return int reports written
 	 */
 	public static function refresh( Marsad_Connector $c, $deadline ): int {
-		$written = 0;
+		$written  = 0;
+		$attempts = get_option( self::OPT_ATTEMPTS, array() );
+		$died     = (array) ( ( is_array( $attempts ) ? $attempts : array() )[ $c->id() ] ?? array() );
 		foreach ( self::queue( $c ) as $key ) {
 			if ( time() >= $deadline ) {
 				break;
 			}
 			// Cleared first, so a connector can record a partial problem (one report rejected) during the call.
 			self::clear_error( $c->id(), $key );
+			if ( isset( $died[ $key ] ) ) {
+				// Still marked from an earlier run: that run died here. Said once, kept if this one fails too.
+				self::record_error( $c->id(), $key, __( 'The last refresh of this period did not finish (the host stopped it: memory or time limit). It is retried after the others.', 'marsad' ) );
+			}
+			// Marked before the call: if the host kills the process here (memory, time), the next run
+			// knows this range never finished and tries the others first.
+			self::attempt( $c->id(), $key, true );
 			try {
 				$payloads = $c->snapshots( $key, self::range( $key, null, $c->history_start() ) );
 				foreach ( $payloads as $report => $payload ) {
@@ -182,12 +206,40 @@ class Marsad_Snapshots {
 						$written++;
 					}
 				}
+				if ( isset( $died[ $key ] ) ) {
+					self::forget_died_note( $c->id(), $key );
+				}
 			} catch ( Throwable $e ) {
 				// Throwable, not Exception: an unexpected API shape raising a TypeError must not end the cron run.
 				self::record_error( $c->id(), $key, $e->getMessage() );
 			}
+			self::attempt( $c->id(), $key, false );
 		}
 		return $written;
+	}
+
+	/** Remove the "did not finish" note after a successful retry, keeping any note the connector added. */
+	private static function forget_died_note( $source, $range_key ): void {
+		$note = __( 'The last refresh of this period did not finish (the host stopped it: memory or time limit). It is retried after the others.', 'marsad' );
+		$all  = self::errors();
+		$msg  = (string) ( $all[ $source ][ $range_key ]['message'] ?? '' );
+		$rest = trim( str_replace( array( $note . ' | ', $note ), '', $msg ) );
+		self::clear_error( $source, $range_key );
+		if ( '' !== $rest ) {
+			self::record_error( $source, $range_key, $rest );
+		}
+	}
+
+	/** Set or clear the "started, not finished" mark of one range. */
+	private static function attempt( $source, $range_key, $on ): void {
+		$all = get_option( self::OPT_ATTEMPTS, array() );
+		$all = is_array( $all ) ? $all : array();
+		if ( $on ) {
+			$all[ $source ][ $range_key ] = time();
+		} else {
+			unset( $all[ $source ][ $range_key ] );
+		}
+		update_option( self::OPT_ATTEMPTS, $all, false );
 	}
 
 	/**
@@ -198,18 +250,21 @@ class Marsad_Snapshots {
 	 * @return string[] range keys
 	 */
 	private static function queue( Marsad_Connector $c ): array {
-		$errors = self::errors( $c->id() );
+		$attempts = get_option( self::OPT_ATTEMPTS, array() );
+		$died     = (array) ( $attempts[ $c->id() ] ?? array() );
+		$errors   = self::errors( $c->id() );
 		$todo   = array();
 		foreach ( self::RANGES as $i => $key ) {
 			$got = self::get( $c->id(), $key, 'totals' );
 			$ttl = self::TTL[ $key ];
 			$age = null === $got ? null : time() - $got['fetched_at'];
-			if ( null !== $age && $age < $ttl ) {
+			// The margin keeps a range fetched at 10:00:40 due at the 11:00:05 run, not the one after.
+			if ( null !== $age && $age < $ttl - self::MARGIN ) {
 				continue;
 			}
 			$todo[] = array(
 				'key'     => $key,
-				'failed'  => isset( $errors[ $key ] ) ? 1 : 0,
+				'failed'  => ( isset( $errors[ $key ] ) || isset( $died[ $key ] ) ) ? 1 : 0,
 				'urgency' => null === $age ? INF : $age / $ttl,
 				'order'   => $i,
 			);
