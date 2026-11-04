@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.7.2
+
+- Settings: whether a role sees the statistics is now the first switch in that role's card, next to its sections and platforms. The separate list at the top could disagree with the cards: a role given sections there still saw nothing.
+
 ## 0.7.1
 
 - Live stream platforms are stored as keys and named in each admin's own language when shown (they were stored in the site's language at push time).

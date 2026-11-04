@@ -29,7 +29,9 @@ class Marsad_Admin_Settings {
 			$may  = $s['role_connect'][ $key ] ?? array();
 			echo '<fieldset class="marsad-role"><legend>' . esc_html( translate_user_role( $role['name'] ) ) . '</legend>';
 			echo '<input type="hidden" name="roles_shown[]" value="' . esc_attr( $key ) . '">';
-			echo '<div><b>' . esc_html__( 'Sections it sees', 'marsad' ) . '</b>';
+			// One place decides whether the role sees statistics at all; the sections below refine it.
+			echo '<label class="marsad-role-view"><input type="checkbox" name="view_roles[]" value="' . esc_attr( $key ) . '"' . checked( in_array( $key, (array) $s['view_roles'], true ), true, false ) . '> <b>' . esc_html__( 'Can see the statistics', 'marsad' ) . '</b></label>';
+			echo '<div class="marsad-role-tabs"><b>' . esc_html__( 'Sections it sees', 'marsad' ) . '</b>';
 			foreach ( $tabs as $t => $label ) {
 				echo '<label><input type="checkbox" name="role_tabs[' . esc_attr( $key ) . '][]" value="' . esc_attr( $t ) . '"' . checked( in_array( $t, $seen, true ), true, false ) . '> ' . esc_html( $label ) . '</label>';
 			}
@@ -39,7 +41,7 @@ class Marsad_Admin_Settings {
 			}
 			echo '</div></fieldset>';
 		}
-		echo '<p class="description">' . esc_html__( 'Sections apply only to roles that may see the dashboard (ticked above). A role allowed to connect platforms gets the Connections page with just those cards.', 'marsad' ) . '</p></div>';
+		echo '</div><p class="description">' . esc_html__( 'Administrators always see and connect everything. The sections count only when "Can see the statistics" is ticked; a role may connect platforms without seeing the statistics.', 'marsad' ) . '</p>';
 	}
 
 	public static function render() {
@@ -54,12 +56,6 @@ class Marsad_Admin_Settings {
 		wp_nonce_field( 'marsad_save_settings' );
 		echo '<input type="hidden" name="action" value="marsad_save_settings"><table class="form-table" role="presentation">';
 
-		echo '<tr><th>' . esc_html__( 'Who can see the dashboard', 'marsad' ) . '</th><td><fieldset>';
-		foreach ( wp_roles()->roles as $key => $role ) {
-			$is_admin = 'administrator' === $key;
-			echo '<label><input type="checkbox" name="view_roles[]" value="' . esc_attr( $key ) . '"' . checked( $is_admin || in_array( $key, $s['view_roles'], true ), true, false ) . disabled( $is_admin, true, false ) . '> ' . esc_html( translate_user_role( $role['name'] ) ) . '</label><br>';
-		}
-		echo '<p class="description">' . esc_html__( 'Below, choose what each of these roles sees and which platforms it may connect. Administrators always have everything.', 'marsad' ) . '</p></fieldset></td></tr>';
 		echo '</table>';
 		self::roles_matrix( $s );
 		echo '<table class="form-table" role="presentation">';

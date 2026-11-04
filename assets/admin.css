@@ -204,6 +204,8 @@
 .marsad-role legend { font-weight: 700; font-size: 15px; padding-inline: 4px; }
 .marsad-role div { display: flex; flex-direction: column; gap: 6px; }
 .marsad-role label { display: flex; align-items: center; gap: 6px; }
+.marsad-role-view { padding-block-end: 10px; border-block-end: 1px solid var(--m-soft); }
+.marsad-role:has(.marsad-role-view input:not(:checked)) .marsad-role-tabs { opacity: .45; }
 
 /* ── Connections ────────────────────────────────────────────────── */
 .marsad-google { display: flex; flex-wrap: wrap; gap: 16px; align-items: center; justify-content: space-between; background: var(--m-bg); border: 1px solid var(--m-line); border-radius: var(--m-radius); padding: 18px 22px; margin-block: 16px 8px; }

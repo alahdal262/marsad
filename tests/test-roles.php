@@ -127,3 +127,15 @@ function test_settings_page_lists_each_role_with_its_choices() {
 	check( false !== strpos( $h, 'name="role_connect[editor][]" value="telegram" checked' ) );
 	check( false === strpos( $h, 'role_tabs[administrator]' ), 'administrators are not restricted' );
 }
+
+function test_each_role_card_decides_whether_it_sees_statistics() {
+	Marsad_Plugin::save_settings( array( 'view_roles' => array( 'administrator', 'editor' ), 'role_tabs' => array( 'editor' => array( 'content' ) ) ) );
+	marsad_test_as_admin();
+	set_site_transient( 'marsad_release', array( 'version' => '9', 'zip' => '', 'body' => '', 'url' => '', 'published' => '' ) );
+	ob_start();
+	Marsad_Admin_Settings::render();
+	$h = ob_get_clean();
+	check( false !== strpos( $h, 'name="view_roles[]" value="editor" checked' ), 'the switch sits in the editor card, ticked' );
+	check( false !== strpos( $h, 'name="view_roles[]" value="author"' ) && false === strpos( $h, 'name="view_roles[]" value="author" checked' ) );
+	same( 1, substr_count( $h, 'name="view_roles[]" value="editor"' ), 'one switch per role, not two lists that can disagree' );
+}
