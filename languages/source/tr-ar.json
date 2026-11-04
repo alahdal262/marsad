@@ -639,6 +639,13 @@
   "saved.": "حُفظ.",
   "sessions": "جلسات",
   "— Choose —": "— اختر —",
-  "“%1$s” gets many views (%2$s) but only %3$s are engaged, against %4$s across the site.": "تحظى «%1$s» بمشاهدات كثيرة (%2$s) لكن معدل التفاعل فيها %3$s فقط، مقابل %4$s في الموقع كله."
+  "“%1$s” gets many views (%2$s) but only %3$s are engaged, against %4$s across the site.": "تحظى «%1$s» بمشاهدات كثيرة (%2$s) لكن معدل التفاعل فيها %3$s فقط، مقابل %4$s في الموقع كله.",
+  "Sees every section and may connect every platform.": "يرى كل الأقسام ويمكنه ربط كل المنصات.",
+  "On the WordPress Dashboard": "في لوحة تحكم ووردبريس",
+  "Sections ticked under \"On the WordPress Dashboard\" appear as boxes on the home screen after login; each user can still hide or move them under Screen Options.": "الأقسام المحددة تحت «في لوحة تحكم ووردبريس» تظهر صناديقَ في الشاشة الرئيسية بعد تسجيل الدخول، ويبقى لكل مستخدم أن يخفيها أو ينقلها من «خيارات الشاشة».",
+  "Nothing to show here yet: its sources are not connected or not synced.": "لا شيء لعرضه بعد: مصادر هذا القسم غير مربوطة أو لم تُزامَن.",
+  "Last 28 days": "آخر 28 يوماً",
+  "Open %s": "افتح %s",
+  "Marsad: %s": "مرصد: %s"
  }
 }

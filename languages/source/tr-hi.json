@@ -632,6 +632,13 @@
   "saved.": "सेव हो गया।",
   "sessions": "सेशन",
   "— Choose —": "— चुनें —",
-  "“%1$s” gets many views (%2$s) but only %3$s are engaged, against %4$s across the site.": "“%1$s” को बहुत व्यू मिलते हैं (%2$s), लेकिन इसकी एंगेजमेंट दर सिर्फ़ %3$s है, जबकि पूरी साइट की %4$s है।"
+  "“%1$s” gets many views (%2$s) but only %3$s are engaged, against %4$s across the site.": "“%1$s” को बहुत व्यू मिलते हैं (%2$s), लेकिन इसकी एंगेजमेंट दर सिर्फ़ %3$s है, जबकि पूरी साइट की %4$s है।",
+  "Sees every section and may connect every platform.": "सभी अनुभाग देखता है और सभी प्लेटफ़ॉर्म जोड़ सकता है।",
+  "On the WordPress Dashboard": "WordPress डैशबोर्ड पर",
+  "Sections ticked under \"On the WordPress Dashboard\" appear as boxes on the home screen after login; each user can still hide or move them under Screen Options.": "\"WordPress डैशबोर्ड पर\" के अंतर्गत चुने गए अनुभाग लॉगिन के बाद होम स्क्रीन पर बॉक्स के रूप में दिखते हैं; हर उपयोगकर्ता उन्हें स्क्रीन विकल्प में छिपा या खिसका सकता है।",
+  "Nothing to show here yet: its sources are not connected or not synced.": "अभी दिखाने को कुछ नहीं: इसके स्रोत जुड़े नहीं हैं या सिंक नहीं हुए हैं।",
+  "Last 28 days": "पिछले 28 दिन",
+  "Open %s": "%s खोलें",
+  "Marsad: %s": "Marsad: %s"
  }
 }

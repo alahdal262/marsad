@@ -632,6 +632,13 @@
   "saved.": "salvato.",
   "sessions": "sessioni",
   "— Choose —": "— Scegli —",
-  "“%1$s” gets many views (%2$s) but only %3$s are engaged, against %4$s across the site.": "“%1$s” ottiene molte visualizzazioni (%2$s), ma solo il %3$s con coinvolgimento, contro il %4$s nell'intero sito."
+  "“%1$s” gets many views (%2$s) but only %3$s are engaged, against %4$s across the site.": "“%1$s” ottiene molte visualizzazioni (%2$s), ma solo il %3$s con coinvolgimento, contro il %4$s nell'intero sito.",
+  "Sees every section and may connect every platform.": "Vede tutte le sezioni e può collegare tutte le piattaforme.",
+  "On the WordPress Dashboard": "Nella Bacheca di WordPress",
+  "Sections ticked under \"On the WordPress Dashboard\" appear as boxes on the home screen after login; each user can still hide or move them under Screen Options.": "Le sezioni spuntate in «Nella Bacheca di WordPress» compaiono come riquadri nella schermata iniziale dopo l’accesso; ogni utente può nasconderle o spostarle da Impostazioni schermata.",
+  "Nothing to show here yet: its sources are not connected or not synced.": "Ancora nulla da mostrare: le sue fonti non sono collegate o non sincronizzate.",
+  "Last 28 days": "Ultimi 28 giorni",
+  "Open %s": "Apri %s",
+  "Marsad: %s": "Marsad: %s"
  }
 }

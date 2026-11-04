@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.7.4
+
+- Marsad sections on the WordPress Dashboard (the home screen after login). In Settings each role card, administrators included, has "On the WordPress Dashboard": the ticked sections appear there as boxes with their key numbers for the last 28 days and a link to the full section. Users can hide or move them under Screen Options. A role nobody configured gets the overview; a section the role may not see never appears.
+
 ## 0.7.3
 
 - Overview shows only what a role may see: no platform card, finding or "All" link that leads to a hidden section (the Site & hosting card stayed visible to roles without the Hosting tab).

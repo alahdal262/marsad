@@ -632,6 +632,13 @@
   "saved.": "ذخیره شد.",
   "sessions": "نشست",
   "— Choose —": "— انتخاب کنید —",
-  "“%1$s” gets many views (%2$s) but only %3$s are engaged, against %4$s across the site.": "«%1$s» بازدید زیادی دارد (%2$s) اما نرخ تعامل آن فقط %3$s است، در برابر %4$s در کل سایت."
+  "“%1$s” gets many views (%2$s) but only %3$s are engaged, against %4$s across the site.": "«%1$s» بازدید زیادی دارد (%2$s) اما نرخ تعامل آن فقط %3$s است، در برابر %4$s در کل سایت.",
+  "Sees every section and may connect every platform.": "همهٔ بخش‌ها را می‌بیند و می‌تواند همهٔ پلتفرم‌ها را وصل کند.",
+  "On the WordPress Dashboard": "در پیشخوان وردپرس",
+  "Sections ticked under \"On the WordPress Dashboard\" appear as boxes on the home screen after login; each user can still hide or move them under Screen Options.": "بخش‌هایی که زیر «در پیشخوان وردپرس» تیک خورده‌اند پس از ورود به‌صورت جعبه در صفحهٔ اصلی نمایش داده می‌شوند؛ هر کاربر می‌تواند آن‌ها را از «تنظیمات صفحه» پنهان یا جابه‌جا کند.",
+  "Nothing to show here yet: its sources are not connected or not synced.": "هنوز چیزی برای نمایش نیست: منابع این بخش وصل یا همگام نشده‌اند.",
+  "Last 28 days": "۲۸ روز گذشته",
+  "Open %s": "باز کردن %s",
+  "Marsad: %s": "مرصد: %s"
  }
 }

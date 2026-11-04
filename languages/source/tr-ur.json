@@ -632,6 +632,13 @@
   "saved.": "محفوظ ہو گیا۔",
   "sessions": "سیشنز",
   "— Choose —": "— منتخب کریں —",
-  "“%1$s” gets many views (%2$s) but only %3$s are engaged, against %4$s across the site.": "“%1$s” کو بہت ویوز ملتے ہیں (%2$s) لیکن اس کا انگیجمنٹ ریٹ صرف %3$s ہے، جبکہ پوری سائٹ کا %4$s ہے۔"
+  "“%1$s” gets many views (%2$s) but only %3$s are engaged, against %4$s across the site.": "“%1$s” کو بہت ویوز ملتے ہیں (%2$s) لیکن اس کا انگیجمنٹ ریٹ صرف %3$s ہے، جبکہ پوری سائٹ کا %4$s ہے۔",
+  "Sees every section and may connect every platform.": "تمام حصے دیکھتا ہے اور تمام پلیٹ فارم جوڑ سکتا ہے۔",
+  "On the WordPress Dashboard": "ورڈپریس ڈیش بورڈ پر",
+  "Sections ticked under \"On the WordPress Dashboard\" appear as boxes on the home screen after login; each user can still hide or move them under Screen Options.": "«ورڈپریس ڈیش بورڈ پر» کے تحت منتخب حصے لاگ اِن کے بعد ہوم اسکرین پر خانوں کی صورت میں دکھائی دیتے ہیں؛ ہر صارف انہیں اسکرین آپشنز سے چھپا یا منتقل کر سکتا ہے۔",
+  "Nothing to show here yet: its sources are not connected or not synced.": "ابھی دکھانے کو کچھ نہیں: اس کے ذرائع جڑے ہوئے نہیں یا ہم آہنگ نہیں ہوئے۔",
+  "Last 28 days": "پچھلے 28 دن",
+  "Open %s": "%s کھولیں",
+  "Marsad: %s": "مرصد: %s"
  }
 }

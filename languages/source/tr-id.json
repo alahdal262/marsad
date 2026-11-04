@@ -629,6 +629,13 @@
   "saved.": "disimpan.",
   "sessions": "sesi",
   "— Choose —": "— Pilih —",
-  "“%1$s” gets many views (%2$s) but only %3$s are engaged, against %4$s across the site.": "“%1$s” mendapat banyak tayangan (%2$s), tetapi hanya %3$s yang berinteraksi, dibandingkan %4$s di seluruh situs."
+  "“%1$s” gets many views (%2$s) but only %3$s are engaged, against %4$s across the site.": "“%1$s” mendapat banyak tayangan (%2$s), tetapi hanya %3$s yang berinteraksi, dibandingkan %4$s di seluruh situs.",
+  "Sees every section and may connect every platform.": "Melihat semua bagian dan boleh menghubungkan semua platform.",
+  "On the WordPress Dashboard": "Di Dasbor WordPress",
+  "Sections ticked under \"On the WordPress Dashboard\" appear as boxes on the home screen after login; each user can still hide or move them under Screen Options.": "Bagian yang dicentang di bawah \"Di Dasbor WordPress\" tampil sebagai kotak di layar beranda setelah masuk; setiap pengguna tetap bisa menyembunyikan atau memindahkannya lewat Opsi Layar.",
+  "Nothing to show here yet: its sources are not connected or not synced.": "Belum ada yang bisa ditampilkan: sumbernya belum terhubung atau belum disinkronkan.",
+  "Last 28 days": "28 hari terakhir",
+  "Open %s": "Buka %s",
+  "Marsad: %s": "Marsad: %s"
  }
 }

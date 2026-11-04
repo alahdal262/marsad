@@ -635,6 +635,13 @@
   "saved.": "сохранено.",
   "sessions": "сеансы",
   "— Choose —": "— Выберите —",
-  "“%1$s” gets many views (%2$s) but only %3$s are engaged, against %4$s across the site.": "«%1$s» набирает много просмотров (%2$s), но вовлечены лишь %3$s, тогда как в среднем по сайту — %4$s."
+  "“%1$s” gets many views (%2$s) but only %3$s are engaged, against %4$s across the site.": "«%1$s» набирает много просмотров (%2$s), но вовлечены лишь %3$s, тогда как в среднем по сайту — %4$s.",
+  "Sees every section and may connect every platform.": "Видит все разделы и может подключать все платформы.",
+  "On the WordPress Dashboard": "На Консоли WordPress",
+  "Sections ticked under \"On the WordPress Dashboard\" appear as boxes on the home screen after login; each user can still hide or move them under Screen Options.": "Разделы, отмеченные в «На Консоли WordPress», появляются блоками на главном экране после входа; каждый пользователь может скрыть или переместить их в «Настройках экрана».",
+  "Nothing to show here yet: its sources are not connected or not synced.": "Пока нечего показать: источники не подключены или не синхронизированы.",
+  "Last 28 days": "Последние 28 дней",
+  "Open %s": "Открыть %s",
+  "Marsad: %s": "Marsad: %s"
  }
 }

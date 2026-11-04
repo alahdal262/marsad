@@ -629,6 +629,13 @@
   "saved.": "已保存。",
   "sessions": "会话",
   "— Choose —": "— 请选择 —",
-  "“%1$s” gets many views (%2$s) but only %3$s are engaged, against %4$s across the site.": "“%1$s”浏览量很高（%2$s），但只有 %3$s 有互动，而全站为 %4$s。"
+  "“%1$s” gets many views (%2$s) but only %3$s are engaged, against %4$s across the site.": "“%1$s”浏览量很高（%2$s），但只有 %3$s 有互动，而全站为 %4$s。",
+  "Sees every section and may connect every platform.": "可查看所有板块，并可连接所有平台。",
+  "On the WordPress Dashboard": "在 WordPress 仪表盘上",
+  "Sections ticked under \"On the WordPress Dashboard\" appear as boxes on the home screen after login; each user can still hide or move them under Screen Options.": "在“在 WordPress 仪表盘上”下勾选的板块，登录后会以方框形式显示在首页；每位用户仍可在“显示选项”中隐藏或移动它们。",
+  "Nothing to show here yet: its sources are not connected or not synced.": "暂无可显示内容：其数据源尚未连接或尚未同步。",
+  "Last 28 days": "最近 28 天",
+  "Open %s": "打开%s",
+  "Marsad: %s": "Marsad：%s"
  }
 }

@@ -104,6 +104,52 @@ class Marsad_Admin_Dashboard {
 		echo '</div>';
 	}
 
+	/**
+	 * One section as a box on the WordPress Dashboard: its key numbers for the last 28 days
+	 * and a link to the full section. Marsad_Admin_Widgets registers one per allowed section.
+	 */
+	public static function widget( $tab ) {
+		if ( ! in_array( $tab, Marsad_Plugin::dashboard_tabs(), true ) ) {
+			return;
+		}
+		self::$report = new Marsad_Report( 28 );
+		self::$snaps  = array();
+		$status       = Marsad_Sync::status();
+		echo '<div class="marsad marsad-widget">';
+		if ( 'overview' === $tab ) {
+			$list = self::headline( self::$report->headline( self::$report->sections() ) );
+			if ( $list ) {
+				echo '<section class="marsad-cards marsad-cards-compact" aria-label="' . esc_attr__( 'Key numbers', 'marsad' ) . '">';
+				foreach ( $list as $i => $h ) {
+					self::stat( $h['label'], $h['value'], Marsad_Admin::change_badge( $h['change'] ), self::COLORS[ $i % count( self::COLORS ) ], $h['series'] );
+				}
+				echo '</section>';
+			}
+		} else {
+			$list = array_values(
+				array_filter(
+					self::$report->sections(),
+					function ( $s ) use ( $tab ) {
+						return self::source_tab( $s['connector']->id() ) === $tab;
+					}
+				)
+			);
+			if ( $list ) {
+				echo '<div class="marsad-pcards">';
+				foreach ( $list as $i => $s ) {
+					self::platform_card( $s, $status[ $s['connector']->id() ] ?? array(), Marsad_Admin_Infographics::COLORS[ $i % count( Marsad_Admin_Infographics::COLORS ) ] );
+				}
+				echo '</div>';
+			}
+		}
+		if ( ! $list ) {
+			echo '<p class="marsad-sub">' . esc_html__( 'Nothing to show here yet: its sources are not connected or not synced.', 'marsad' ) . '</p>';
+		}
+		/* translators: %s: dashboard section name */
+		echo '<p class="marsad-widget-foot"><span class="marsad-sub">' . esc_html__( 'Last 28 days', 'marsad' ) . '</span>' . self::tab_link( $tab, sprintf( __( 'Open %s', 'marsad' ), self::tabs()[ $tab ] ) ) . '</p>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- tab_link escapes.
+		echo '</div>';
+	}
+
 	/* ── tabs ────────────────────────────────────────────────────────── */
 
 	/**

@@ -629,6 +629,13 @@
   "saved.": "保存しました。",
   "sessions": "セッション",
   "— Choose —": "— 選択 —",
-  "“%1$s” gets many views (%2$s) but only %3$s are engaged, against %4$s across the site.": "「%1$s」は表示回数が多い（%2$s）ものの、エンゲージメントがあったのは %3$s だけです（サイト全体では %4$s）。"
+  "“%1$s” gets many views (%2$s) but only %3$s are engaged, against %4$s across the site.": "「%1$s」は表示回数が多い（%2$s）ものの、エンゲージメントがあったのは %3$s だけです（サイト全体では %4$s）。",
+  "Sees every section and may connect every platform.": "すべてのセクションを表示し、すべてのプラットフォームを接続できます。",
+  "On the WordPress Dashboard": "WordPress ダッシュボードに表示",
+  "Sections ticked under \"On the WordPress Dashboard\" appear as boxes on the home screen after login; each user can still hide or move them under Screen Options.": "「WordPress ダッシュボードに表示」でチェックしたセクションは、ログイン後のホーム画面にボックスとして表示されます。各ユーザーは「表示オプション」で非表示にしたり移動したりできます。",
+  "Nothing to show here yet: its sources are not connected or not synced.": "まだ表示するものがありません。ソースが未接続か、未同期です。",
+  "Last 28 days": "過去 28 日間",
+  "Open %s": "%s を開く",
+  "Marsad: %s": "Marsad: %s"
  }
 }

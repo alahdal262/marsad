@@ -367,3 +367,13 @@
 	.marsad-cell-text, .marsad-cell-path { max-width: 26ch; }
 	.marsad-tbl th, .marsad-tbl td { padding: 7px 6px; }
 }
+
+/* Boxes on the WordPress Dashboard. */
+.marsad-widget { max-width: none; }
+.marsad-widget .marsad-cards { grid-template-columns: repeat(auto-fill, minmax(min(100%, 140px), 1fr)); gap: 10px; margin: 0; }
+.marsad-widget .marsad-card { padding: 12px; }
+.marsad-widget .marsad-num { font-size: 22px; }
+.marsad-widget .marsad-pcards { grid-template-columns: 1fr; gap: 10px; }
+.marsad-widget .marsad-pcard { padding: 14px; }
+.marsad-widget-foot { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin: 12px 0 0; }
+.marsad-widget-foot a { font-weight: 600; text-decoration: none; }

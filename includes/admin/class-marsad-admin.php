@@ -15,6 +15,7 @@ class Marsad_Admin {
 		foreach ( array( 'save_connector', 'test_connector', 'sync_now', 'forget_connector', 'save_settings', 'check_update', 'google_connect', 'google_return', 'google_disconnect', 'export' ) as $a ) {
 			add_action( 'admin_post_marsad_' . $a, array( __CLASS__, 'handle_' . $a ) );
 		}
+		add_action( 'wp_dashboard_setup', array( 'Marsad_Admin_Widgets', 'register' ) );
 		add_action( 'wp_ajax_marsad_realtime', array( __CLASS__, 'ajax_realtime' ) );
 		add_filter( 'plugin_action_links_' . plugin_basename( MARSAD_FILE ), array( __CLASS__, 'action_links' ) );
 	}
@@ -27,6 +28,13 @@ class Marsad_Admin {
 	}
 
 	public static function assets( $hook ) {
+		if ( 'index.php' === $hook ) {
+			// The WordPress Dashboard: only the styles, and only when it shows a Marsad section.
+			if ( Marsad_Plugin::dashboard_tabs() ) {
+				wp_enqueue_style( 'marsad-admin', MARSAD_URL . 'assets/admin.css', array(), MARSAD_VERSION );
+			}
+			return;
+		}
 		if ( false === strpos( (string) $hook, self::SLUG ) ) {
 			return;
 		}
@@ -349,6 +357,7 @@ class Marsad_Admin {
 				'backfill_days'  => max( 7, min( 480, (int) ( $_POST['backfill_days'] ?? 90 ) ) ),
 				'role_tabs'      => self::posted_role_lists( 'role_tabs' ),
 				'role_connect'   => self::posted_role_lists( 'role_connect' ),
+				'role_widgets'   => self::posted_role_lists( 'role_widgets' ),
 			)
 		);
 		self::notice( 'success', __( 'Settings saved.', 'marsad' ) );

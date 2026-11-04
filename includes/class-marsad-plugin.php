@@ -82,6 +82,8 @@ class Marsad_Plugin {
 			// role => tabs it sees (absent: every tab), role => sources it may connect (absent: none).
 			'role_tabs'      => array(),
 			'role_connect'   => array(),
+			// role => sections shown on the WordPress Dashboard (absent: the overview).
+			'role_widgets'   => array(),
 		);
 	}
 
@@ -105,6 +107,24 @@ class Marsad_Plugin {
 			$tabs = array_merge( $tabs, (array) $map[ $role ] );
 		}
 		return array_values( array_intersect( $all, $tabs ) );
+	}
+
+	/**
+	 * Sections the current user gets on the WordPress Dashboard: what their roles were given
+	 * there (the overview when nobody chose), limited to the sections they may see.
+	 *
+	 * @return string[] tab keys, in dashboard order
+	 */
+	public static function dashboard_tabs() {
+		if ( ! current_user_can( self::CAP_VIEW ) ) {
+			return array();
+		}
+		$map  = self::settings()['role_widgets'];
+		$want = array();
+		foreach ( (array) wp_get_current_user()->roles as $role ) {
+			$want = array_merge( $want, (array) ( $map[ $role ] ?? array( 'overview' ) ) );
+		}
+		return array_values( array_intersect( self::allowed_tabs(), $want ) );
 	}
 
 	/** May the current user connect this source ('google' for the Google account, 'custom' for own sources)? */
@@ -145,10 +165,11 @@ class Marsad_Plugin {
 		// Only real tabs and sources survive, whatever was posted.
 		$tabs  = array_keys( Marsad_Admin_Dashboard::tabs() );
 		$conns = self::connectable();
-		foreach ( array( 'role_tabs' => $tabs, 'role_connect' => $conns ) as $key => $valid ) {
+		foreach ( array( 'role_tabs' => $tabs, 'role_connect' => $conns, 'role_widgets' => $tabs ) as $key => $valid ) {
 			$clean = array();
 			foreach ( (array) $s[ $key ] as $role => $list ) {
-				if ( 'administrator' !== $role && isset( wp_roles()->roles[ $role ] ) ) {
+				// Administrators see and connect everything, but choose their own Dashboard sections.
+				if ( ( 'administrator' !== $role || 'role_widgets' === $key ) && isset( wp_roles()->roles[ $role ] ) ) {
 					$clean[ $role ] = array_values( array_intersect( array_map( 'strval', (array) $list ), $valid ) );
 				}
 			}

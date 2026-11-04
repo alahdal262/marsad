@@ -632,6 +632,13 @@
   "saved.": "kaydedildi.",
   "sessions": "oturum",
   "— Choose —": "— Seçin —",
-  "“%1$s” gets many views (%2$s) but only %3$s are engaged, against %4$s across the site.": "“%1$s” çok görüntüleniyor (%2$s), ancak yalnızca %3$s etkileşimli; sitenin genelinde bu oran %4$s."
+  "“%1$s” gets many views (%2$s) but only %3$s are engaged, against %4$s across the site.": "“%1$s” çok görüntüleniyor (%2$s), ancak yalnızca %3$s etkileşimli; sitenin genelinde bu oran %4$s.",
+  "Sees every section and may connect every platform.": "Tüm bölümleri görür ve tüm platformları bağlayabilir.",
+  "On the WordPress Dashboard": "WordPress Başlangıç sayfasında",
+  "Sections ticked under \"On the WordPress Dashboard\" appear as boxes on the home screen after login; each user can still hide or move them under Screen Options.": "\"WordPress Başlangıç sayfasında\" altında işaretlenen bölümler girişten sonra ana ekranda kutu olarak görünür; her kullanıcı bunları Ekran Ayarları’ndan gizleyebilir veya taşıyabilir.",
+  "Nothing to show here yet: its sources are not connected or not synced.": "Henüz gösterilecek bir şey yok: kaynakları bağlı değil veya eşitlenmedi.",
+  "Last 28 days": "Son 28 gün",
+  "Open %s": "%s aç",
+  "Marsad: %s": "Marsad: %s"
  }
 }

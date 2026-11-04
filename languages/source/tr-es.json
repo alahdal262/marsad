@@ -632,6 +632,13 @@
   "saved.": "guardado.",
   "sessions": "sesiones",
   "— Choose —": "— Elegir —",
-  "“%1$s” gets many views (%2$s) but only %3$s are engaged, against %4$s across the site.": "“%1$s” recibe muchas vistas (%2$s), pero solo el %3$s tiene interacción, frente al %4$s en todo el sitio."
+  "“%1$s” gets many views (%2$s) but only %3$s are engaged, against %4$s across the site.": "“%1$s” recibe muchas vistas (%2$s), pero solo el %3$s tiene interacción, frente al %4$s en todo el sitio.",
+  "Sees every section and may connect every platform.": "Ve todas las secciones y puede conectar todas las plataformas.",
+  "On the WordPress Dashboard": "En el Escritorio de WordPress",
+  "Sections ticked under \"On the WordPress Dashboard\" appear as boxes on the home screen after login; each user can still hide or move them under Screen Options.": "Las secciones marcadas en «En el Escritorio de WordPress» aparecen como cajas en la pantalla de inicio tras acceder; cada usuario puede ocultarlas o moverlas en Opciones de pantalla.",
+  "Nothing to show here yet: its sources are not connected or not synced.": "Aún no hay nada que mostrar: sus fuentes no están conectadas o no se han sincronizado.",
+  "Last 28 days": "Últimos 28 días",
+  "Open %s": "Abrir %s",
+  "Marsad: %s": "Marsad: %s"
  }
 }
