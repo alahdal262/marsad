@@ -5,6 +5,8 @@ foreach (
 		'checked'       => function ( $a, $b = true, $e = true ) { return (string) $a === (string) $b ? ' checked="checked"' : ''; },
 		'selected'      => function ( $a, $b = true, $e = true ) { return (string) $a === (string) $b ? ' selected="selected"' : ''; },
 		'esc_textarea'  => function ( $s ) { return htmlspecialchars( (string) $s, ENT_QUOTES ); },
+		'rest_url'           => function ( $p = '' ) { return 'https://example.test/wp-json/' . ltrim( $p, '/' ); },
+		'wp_generate_password' => function ( $n = 12, $special = true ) { return substr( str_repeat( 'abcdef0123456789', 4 ), 0, $n ); },
 	) as $name => $fn
 ) {
 	if ( ! function_exists( $name ) ) {

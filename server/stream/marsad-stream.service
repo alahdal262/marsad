@@ -1,0 +1,13 @@
+[Unit]
+Description=Marsad live-stream collector (counts viewers, sends totals to Marsad)
+After=docker.service network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+EnvironmentFile=/etc/marsad-stream.env
+ExecStart=/usr/bin/python3 /opt/marsad-stream/marsad_stream.py
+# Reads logs and writes one state file; nothing else.
+Nice=10
+IOSchedulingClass=idle
+TimeoutStartSec=180

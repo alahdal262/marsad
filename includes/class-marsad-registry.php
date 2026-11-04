@@ -31,8 +31,12 @@ class Marsad_Registry {
 			'Marsad_Connector_Facebook',
 			'Marsad_Connector_Instagram',
 			'Marsad_Connector_Telegram',
+			'Marsad_Connector_X',
+			'Marsad_Connector_Threads',
+			'Marsad_Connector_Tiktok',
 			'Marsad_Connector_Google_Play',
 			'Marsad_Connector_App_Store',
+			'Marsad_Connector_Stream',
 		);
 	}
 

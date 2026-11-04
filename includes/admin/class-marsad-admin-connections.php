@@ -11,12 +11,13 @@ class Marsad_Admin_Connections {
 	const NEW_ID = 'new';
 
 	public static function render() {
-		if ( ! current_user_can( Marsad_Plugin::CAP_MANAGE ) ) {
+		if ( ! current_user_can( Marsad_Plugin::CAP_CONNECT ) ) {
 			wp_die( esc_html__( 'You are not allowed to manage connections.', 'marsad' ), 403 );
 		}
 		$open   = sanitize_key( wp_unslash( $_GET['open'] ?? '' ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		$status = Marsad_Sync::status();
 		$groups = array(
+			'live'    => __( 'Live stream', 'marsad' ),
 			'web'     => __( 'Website', 'marsad' ),
 			'search'  => __( 'Search', 'marsad' ),
 			'apps'    => __( 'Mobile apps', 'marsad' ),
@@ -26,8 +27,12 @@ class Marsad_Admin_Connections {
 		);
 		$by_group = array();
 		foreach ( Marsad_Registry::all() as $c ) {
-			$by_group[ $c->group() ][] = $c;
+			// Each role sees only the sources Settings lets it connect; always-on ones need no setup.
+			if ( Marsad_Admin::may_change( $c->id() ) && ( ! $c->always_on() || current_user_can( Marsad_Plugin::CAP_MANAGE ) ) ) {
+				$by_group[ $c->group() ][] = $c;
+			}
 		}
+		$custom_ok = Marsad_Admin::may_change( self::NEW_ID );
 
 		echo '<div class="wrap marsad"><div class="marsad-top"><div><h1>' . esc_html__( 'Connections', 'marsad' ) . '</h1>';
 		echo '<p class="marsad-sub">' . esc_html__( 'Each site connects its own accounts. Secrets are stored encrypted and are never shown again after saving.', 'marsad' ) . '</p></div>';
@@ -35,10 +40,12 @@ class Marsad_Admin_Connections {
 		wp_nonce_field( 'marsad_sync_now' );
 		echo '<input type="hidden" name="action" value="marsad_sync_now"><input type="hidden" name="back" value="connections"><button class="button">' . esc_html__( 'Sync all now', 'marsad' ) . '</button></form></div></div>';
 		Marsad_Admin::print_notice();
-		self::google_card();
+		if ( Marsad_Plugin::can_connect( 'google' ) ) {
+			self::google_card();
+		}
 
 		foreach ( $groups as $g => $title ) {
-			if ( empty( $by_group[ $g ] ) && 'custom' !== $g ) {
+			if ( empty( $by_group[ $g ] ) && ( 'custom' !== $g || ! $custom_ok ) ) {
 				continue;
 			}
 			echo '<h2 class="marsad-group">' . esc_html( $title ) . '</h2>';
@@ -49,7 +56,7 @@ class Marsad_Admin_Connections {
 			foreach ( $by_group[ $g ] ?? array() as $c ) {
 				self::card( $c, $status[ $c->id() ] ?? array(), $open === $c->id() );
 			}
-			if ( 'custom' === $g ) {
+			if ( 'custom' === $g && $custom_ok ) {
 				self::add_card( 'new' === $open );
 			}
 			echo '</div>';
@@ -183,6 +190,10 @@ class Marsad_Admin_Connections {
 		$name  = 'f[' . $key . ']';
 		$id    = 'marsad-' . $c->id() . '-' . $key;
 		$value = (string) $c->get( $key );
+		if ( '' === $value && ! empty( $f['generate'] ) ) {
+			// Offered, not saved: it becomes the key when the card is saved.
+			$value = wp_generate_password( 40, false );
+		}
 		$req   = ! empty( $f['required'] ) ? ' <span class="marsad-req">*</span>' : '';
 		$adv   = ! empty( $f['advanced'] );
 		if ( $adv ) {

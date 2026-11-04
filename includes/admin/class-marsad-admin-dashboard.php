@@ -45,7 +45,11 @@ class Marsad_Admin_Dashboard {
 		$n   = (int) ( $_GET['range'] ?? 28 );
 		$tab = sanitize_key( wp_unslash( $_GET['tab'] ?? 'overview' ) );
 		// phpcs:enable
-		$tab          = isset( self::tabs()[ $tab ] ) ? $tab : 'overview';
+		$allowed      = Marsad_Plugin::allowed_tabs();
+		if ( ! $allowed ) {
+			wp_die( esc_html__( 'Your role has no statistics sections. Ask an administrator to choose some under Marsad → Settings.', 'marsad' ), 403 );
+		}
+		$tab          = in_array( $tab, $allowed, true ) ? $tab : $allowed[0];
 		self::$report = new Marsad_Report( $n );
 		self::$snaps  = array();
 		$report       = self::$report;
@@ -71,7 +75,7 @@ class Marsad_Admin_Dashboard {
 		echo '</div></header>';
 
 		echo '<nav class="marsad-tabs" aria-label="' . esc_attr__( 'Dashboard sections', 'marsad' ) . '">';
-		foreach ( self::tabs() as $key => $label ) {
+		foreach ( array_intersect_key( self::tabs(), array_flip( $allowed ) ) as $key => $label ) {
 			$on = $key === $tab;
 			echo '<a href="' . esc_url( Marsad_Admin::url( '', array( 'tab' => $key, 'range' => $report->key() ) ) ) . '"' . ( $on ? ' class="is-on" aria-current="page"' : '' ) . '>' . esc_html( $label ) . '</a>';
 		}
@@ -79,15 +83,21 @@ class Marsad_Admin_Dashboard {
 		Marsad_Admin::print_notice();
 
 		echo '<div class="marsad-titlebar"><h2>' . esc_html( self::tabs()[ $tab ] ) . '</h2><span class="marsad-sub">';
-		echo esc_html(
-			sprintf(
+		if ( $report->all ) {
+			// Each source starts on its own first day (GA4 years back, Search Console 16 months),
+			// so one start date would contradict some of the numbers below it.
+			/* translators: 1: end date, 2: e.g. "5 minutes ago" */
+			$sub = sprintf( __( 'Everything each source has kept, up to %1$s · synced %2$s', 'marsad' ), date_i18n( get_option( 'date_format' ), strtotime( $report->range['to'] . ' 12:00 UTC' ) ), Marsad_Admin::ago( $last ) );
+		} else {
+			$sub = sprintf(
 				/* translators: 1: start date, 2: end date, 3: e.g. "5 minutes ago" */
-				$report->all ? __( '%1$s – %2$s, everything recorded · synced %3$s', 'marsad' ) : __( '%1$s – %2$s, compared with the period before · synced %3$s', 'marsad' ),
+				__( '%1$s – %2$s, compared with the period before · synced %3$s', 'marsad' ),
 				date_i18n( get_option( 'date_format' ), strtotime( $report->range['from'] . ' 12:00 UTC' ) ),
 				date_i18n( get_option( 'date_format' ), strtotime( $report->range['to'] . ' 12:00 UTC' ) ),
 				Marsad_Admin::ago( $last )
-			)
-		);
+			);
+		}
+		echo esc_html( $sub );
 		echo '</span></div>';
 
 		call_user_func( array( __CLASS__, 'tab_' . $tab ), $status );
@@ -1042,6 +1052,13 @@ class Marsad_Admin_Dashboard {
 		$st     = $status[ $c->id() ] ?? array();
 		$aside  = ( $st && empty( $st['ok'] ) ) ? '<span class="marsad-pill marsad-pill-bad" title="' . esc_attr( $st['message'] ) . '">' . esc_html__( 'Last sync failed', 'marsad' ) . '</span>' : '';
 		$sub    = $c->is_snapshot() ? __( 'Recorded once a day; history starts the day you connected it.', 'marsad' ) : '';
+		if ( 'stream' === $c->id() ) {
+			$now = Marsad_Connector_Stream::now();
+			if ( $now && $now['at'] > time() - 15 * MINUTE_IN_SECONDS ) {
+				/* translators: 1: number of viewers, 2: e.g. "3 minutes ago" */
+				$aside .= '<b class="marsad-big">' . esc_html( sprintf( __( '%1$s watching now (%2$s)', 'marsad' ), number_format_i18n( $now['viewers'] ), Marsad_Admin::ago( $now['at'] ) ) ) . '</b>';
+			}
+		}
 		self::panel_open( $c->label(), $sub, 'full', $aside, 'marsad-src-' . $c->id() );
 
 		$cards = array_filter( $s['metrics'], function ( $m ) { return ! empty( $m['kpi'] ); } );

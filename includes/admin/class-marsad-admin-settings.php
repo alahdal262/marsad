@@ -7,6 +7,41 @@ defined( 'ABSPATH' ) || exit;
 
 class Marsad_Admin_Settings {
 
+	/**
+	 * Per role: the dashboard tabs it sees and the sources it may connect. A role nobody
+	 * restricted sees every tab; connecting is never given until ticked here.
+	 */
+	private static function roles_matrix( array $s ) {
+		$tabs  = Marsad_Admin_Dashboard::tabs();
+		$names = array(
+			'google' => __( 'Google account (Analytics, Search Console, YouTube, Google Play)', 'marsad' ),
+			'custom' => __( 'Your own sources', 'marsad' ),
+		);
+		foreach ( Marsad_Registry::all() as $c ) {
+			$names[ $c->id() ] = $c->label();
+		}
+		echo '<h2>' . esc_html__( 'What each role sees and may connect', 'marsad' ) . '</h2><div class="marsad-roles">';
+		foreach ( wp_roles()->roles as $key => $role ) {
+			if ( 'administrator' === $key ) {
+				continue;
+			}
+			$seen = $s['role_tabs'][ $key ] ?? array_keys( $tabs );
+			$may  = $s['role_connect'][ $key ] ?? array();
+			echo '<fieldset class="marsad-role"><legend>' . esc_html( translate_user_role( $role['name'] ) ) . '</legend>';
+			echo '<input type="hidden" name="roles_shown[]" value="' . esc_attr( $key ) . '">';
+			echo '<div><b>' . esc_html__( 'Sections it sees', 'marsad' ) . '</b>';
+			foreach ( $tabs as $t => $label ) {
+				echo '<label><input type="checkbox" name="role_tabs[' . esc_attr( $key ) . '][]" value="' . esc_attr( $t ) . '"' . checked( in_array( $t, $seen, true ), true, false ) . '> ' . esc_html( $label ) . '</label>';
+			}
+			echo '</div><div><b>' . esc_html__( 'Platforms it may connect', 'marsad' ) . '</b>';
+			foreach ( Marsad_Plugin::connectable() as $id ) {
+				echo '<label><input type="checkbox" name="role_connect[' . esc_attr( $key ) . '][]" value="' . esc_attr( $id ) . '"' . checked( in_array( $id, $may, true ), true, false ) . '> ' . esc_html( $names[ $id ] ?? $id ) . '</label>';
+			}
+			echo '</div></fieldset>';
+		}
+		echo '<p class="description">' . esc_html__( 'Sections apply only to roles that may see the dashboard (ticked above). A role allowed to connect platforms gets the Connections page with just those cards.', 'marsad' ) . '</p></div>';
+	}
+
 	public static function render() {
 		if ( ! current_user_can( Marsad_Plugin::CAP_MANAGE ) ) {
 			wp_die( esc_html__( 'You are not allowed to change Marsad settings.', 'marsad' ), 403 );
@@ -24,7 +59,10 @@ class Marsad_Admin_Settings {
 			$is_admin = 'administrator' === $key;
 			echo '<label><input type="checkbox" name="view_roles[]" value="' . esc_attr( $key ) . '"' . checked( $is_admin || in_array( $key, $s['view_roles'], true ), true, false ) . disabled( $is_admin, true, false ) . '> ' . esc_html( translate_user_role( $role['name'] ) ) . '</label><br>';
 		}
-		echo '<p class="description">' . esc_html__( 'They can view the numbers only. Connecting accounts and these settings stay with administrators.', 'marsad' ) . '</p></fieldset></td></tr>';
+		echo '<p class="description">' . esc_html__( 'Below, choose what each of these roles sees and which platforms it may connect. Administrators always have everything.', 'marsad' ) . '</p></fieldset></td></tr>';
+		echo '</table>';
+		self::roles_matrix( $s );
+		echo '<table class="form-table" role="presentation">';
 
 		$intervals = array(
 			'hourly'     => __( 'Every hour', 'marsad' ),

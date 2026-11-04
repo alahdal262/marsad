@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.7.0
+
+- **Live stream**: a collector for the streaming server (`server/stream`, Python, systemd timer) counts who watches the HLS stream and on what — website, live player page, iPhone and Android apps, Samsung/LG/Fire/Roku/Apple/Android TVs, IPTV players, other sites playing the stream, re-broadcasting tools — and pushes counts only (no IPs) to `/wp-json/marsad/v1/push/stream`. Viewers a day, hours watched, peak viewers at once, and "watching now".
+- **Roles**: Settings chooses, per role, which dashboard sections it sees and which platforms it may connect (the Google account, own sources, or single sources). The Connections page then shows that role only those cards; every handler checks the same rule.
+- **X (Twitter)** (paid API plan required), **Threads** (token renewed weekly, pasted once) and **TikTok** (refresh token rotated automatically).
+- Social audience in the headline now includes X, Threads and TikTok.
+- The All time subtitle no longer shows one start date that contradicts sources keeping longer history.
+- `docs/google-oauth-verification.md`: everything Google's app verification asks for.
+- Translations for all 15 languages.
+
 ## 0.6.1
 
 - The total in the middle of the channels donut is drawn left-to-right, so Arabic, Persian and Urdu screens no longer cut it at the ring.

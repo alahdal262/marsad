@@ -94,7 +94,7 @@ class Marsad_Report {
 	 * Sections for every enabled source, in group order.
 	 */
 	public function sections() {
-		$order = array( 'web' => 0, 'search' => 1, 'apps' => 2, 'social' => 3, 'content' => 4, 'custom' => 5 );
+		$order = array( 'live' => -1, 'web' => 0, 'search' => 1, 'apps' => 2, 'social' => 3, 'content' => 4, 'custom' => 5 );
 		$list  = array_values( Marsad_Registry::enabled() );
 		usort(
 			$list,
@@ -134,7 +134,7 @@ class Marsad_Report {
 			'views'    => array( 'label' => __( 'Page & screen views', 'marsad' ), 'from' => array( 'ga4:views' ) ),
 			'search'   => array( 'label' => __( 'Clicks from Google Search', 'marsad' ), 'from' => array( 'search_console:clicks' ) ),
 			'installs' => array( 'label' => __( 'App installs', 'marsad' ), 'from' => array( 'google_play:installs', 'app_store:downloads' ) ),
-			'social'   => array( 'label' => __( 'Social audience', 'marsad' ), 'from' => array( 'youtube:subscribers', 'facebook:followers', 'instagram:followers', 'telegram:members' ) ),
+			'social'   => array( 'label' => __( 'Social audience', 'marsad' ), 'from' => array( 'youtube:subscribers', 'facebook:followers', 'instagram:followers', 'telegram:members', 'x:followers', 'threads:followers', 'tiktok:followers' ) ),
 			'posts'    => array( 'label' => __( 'Posts published', 'marsad' ), 'from' => array( 'wordpress:posts' ) ),
 		);
 		$defs = apply_filters( 'marsad_headline', $defs );

@@ -22,7 +22,7 @@ class Marsad_Admin {
 	public static function menu() {
 		add_menu_page( __( 'Marsad', 'marsad' ), __( 'Marsad', 'marsad' ), Marsad_Plugin::CAP_VIEW, self::SLUG, array( 'Marsad_Admin_Dashboard', 'render' ), 'dashicons-chart-area', 3 );
 		add_submenu_page( self::SLUG, __( 'Dashboard', 'marsad' ), __( 'Dashboard', 'marsad' ), Marsad_Plugin::CAP_VIEW, self::SLUG, array( 'Marsad_Admin_Dashboard', 'render' ) );
-		add_submenu_page( self::SLUG, __( 'Connections', 'marsad' ), __( 'Connections', 'marsad' ), Marsad_Plugin::CAP_MANAGE, self::SLUG . '-connections', array( 'Marsad_Admin_Connections', 'render' ) );
+		add_submenu_page( self::SLUG, __( 'Connections', 'marsad' ), __( 'Connections', 'marsad' ), Marsad_Plugin::CAP_CONNECT, self::SLUG . '-connections', array( 'Marsad_Admin_Connections', 'render' ) );
 		add_submenu_page( self::SLUG, __( 'Settings', 'marsad' ), __( 'Settings', 'marsad' ), Marsad_Plugin::CAP_MANAGE, self::SLUG . '-settings', array( 'Marsad_Admin_Settings', 'render' ) );
 	}
 
@@ -68,6 +68,26 @@ class Marsad_Admin {
 		check_admin_referer( 'marsad_' . $action );
 	}
 
+	/**
+	 * May the current user change this source (or add a custom one, for the "new" id)?
+	 * Managers always; others only for what Settings gives their role.
+	 */
+	public static function may_change( $id ) {
+		if ( Marsad_Admin_Connections::NEW_ID === $id || Marsad_Registry::is_custom( (string) $id ) ) {
+			return Marsad_Plugin::can_connect( 'custom' );
+		}
+		return Marsad_Plugin::can_connect( (string) $id );
+	}
+
+	/** guard() for a source: the role must be allowed this very source. */
+	private static function guard_source( $action ) {
+		self::guard( $action, Marsad_Plugin::CAP_CONNECT );
+		$id = sanitize_key( wp_unslash( $_POST['connector'] ?? '' ) ); // phpcs:ignore WordPress.Security.NonceVerification.Missing -- verified in guard().
+		if ( ! self::may_change( $id ) ) {
+			wp_die( esc_html__( 'Your role may not connect this source.', 'marsad' ), 403 );
+		}
+	}
+
 	private static function connector_from_post() {
 		$id = sanitize_key( wp_unslash( $_POST['connector'] ?? '' ) ); // phpcs:ignore WordPress.Security.NonceVerification.Missing -- verified in guard().
 		$c  = Marsad_Registry::get( $id );
@@ -83,7 +103,7 @@ class Marsad_Admin {
 	}
 
 	public static function handle_save_connector() {
-		self::guard( 'save_connector' );
+		self::guard_source( 'save_connector' );
 		$fields = isset( $_POST['f'] ) && is_array( $_POST['f'] ) ? wp_unslash( $_POST['f'] ) : array(); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- sanitised per field type in Marsad_Registry::save().
 		if ( Marsad_Admin_Connections::NEW_ID === sanitize_key( wp_unslash( $_POST['connector'] ?? '' ) ) ) {
 			$draft = new Marsad_Connector_Json( Marsad_Admin_Connections::NEW_ID );
@@ -111,7 +131,7 @@ class Marsad_Admin {
 	}
 
 	public static function handle_test_connector() {
-		self::guard( 'test_connector' );
+		self::guard_source( 'test_connector' );
 		$c = self::connector_from_post();
 		try {
 			self::notice( 'success', $c->label() . ': ' . $c->test() );
@@ -144,7 +164,7 @@ class Marsad_Admin {
 	}
 
 	public static function handle_forget_connector() {
-		self::guard( 'forget_connector' );
+		self::guard_source( 'forget_connector' );
 		$c = self::connector_from_post();
 		if ( Marsad_Registry::is_custom( $c->id() ) ) {
 			Marsad_Registry::remove_custom( $c->id() );
@@ -175,6 +195,11 @@ class Marsad_Admin {
 		// Report keys keep their case (totals_googleNews), so sanitize_key() would break them.
 		$report = preg_replace( '/[^A-Za-z0-9_]/', '', (string) wp_unslash( $_GET['report'] ?? '' ) );
 		// phpcs:enable
+		// A table is only as visible as the tab that shows it.
+		$tabs = array( 'ga4' => array( 'audience', 'content', 'overview' ), 'search_console' => array( 'search', 'overview' ) );
+		if ( ! array_intersect( $tabs[ $source ] ?? array( 'platforms' ), Marsad_Plugin::allowed_tabs() ) ) {
+			wp_die( esc_html__( 'You are not allowed to view statistics.', 'marsad' ), 403 );
+		}
 		$file = Marsad_Admin_Table::export( $source, $range, $report );
 		if ( ! $file ) {
 			wp_die( esc_html__( 'This report is not available. It may not have been fetched yet.', 'marsad' ), 404 );
@@ -194,6 +219,10 @@ class Marsad_Admin {
 			return;
 		}
 		check_ajax_referer( 'marsad_realtime' );
+		if ( ! in_array( 'audience', Marsad_Plugin::allowed_tabs(), true ) ) {
+			wp_send_json_error( array( 'message' => __( 'You are not allowed to view statistics.', 'marsad' ) ), 403 );
+			return;
+		}
 		$c    = Marsad_Registry::get( 'ga4' );
 		$data = null;
 		if ( $c && Marsad_Registry::is_enabled( $c ) && method_exists( $c, 'realtime' ) ) {
@@ -258,7 +287,10 @@ class Marsad_Admin {
 	/* ── Connect with Google ─────────────────────────────────────────── */
 
 	public static function handle_google_connect() {
-		self::guard( 'google_connect' );
+		self::guard( 'google_connect', Marsad_Plugin::CAP_CONNECT );
+		if ( ! Marsad_Plugin::can_connect( 'google' ) ) {
+			wp_die( esc_html__( 'Your role may not connect this source.', 'marsad' ), 403 );
+		}
 		if ( ! Marsad_Google_Account::relay_ready( 'google' ) ) {
 			self::notice( 'error', __( 'One-click Google sign-in is not available right now. Use a service account key under "Advanced" in each Google card.', 'marsad' ) );
 			self::back( 'connections' );
@@ -270,7 +302,7 @@ class Marsad_Admin {
 
 	/** Google → relay → here, with a one-time handover code (or the reason it failed). */
 	public static function handle_google_return() {
-		if ( ! current_user_can( Marsad_Plugin::CAP_MANAGE ) ) {
+		if ( ! Marsad_Plugin::can_connect( 'google' ) ) {
 			wp_die( esc_html__( 'You are not allowed to do this.', 'marsad' ), 403 );
 		}
 		check_admin_referer( 'marsad_google_return' );
@@ -296,7 +328,10 @@ class Marsad_Admin {
 	}
 
 	public static function handle_google_disconnect() {
-		self::guard( 'google_disconnect' );
+		self::guard( 'google_disconnect', Marsad_Plugin::CAP_CONNECT );
+		if ( ! Marsad_Plugin::can_connect( 'google' ) ) {
+			wp_die( esc_html__( 'Your role may not connect this source.', 'marsad' ), 403 );
+		}
 		Marsad_Google_Account::disconnect();
 		self::notice( 'success', __( 'Google disconnected. Sources that used it stop until you connect again or add a service account.', 'marsad' ) );
 		self::back( 'connections' );
@@ -312,10 +347,28 @@ class Marsad_Admin {
 				'interval'       => in_array( $_POST['interval'] ?? '', array( 'hourly', 'marsad_6h', 'twicedaily', 'daily' ), true ) ? sanitize_key( $_POST['interval'] ) : 'hourly',
 				'retention_days' => max( 30, min( 3650, (int) ( $_POST['retention_days'] ?? 730 ) ) ),
 				'backfill_days'  => max( 7, min( 480, (int) ( $_POST['backfill_days'] ?? 90 ) ) ),
+				'role_tabs'      => self::posted_role_lists( 'role_tabs' ),
+				'role_connect'   => self::posted_role_lists( 'role_connect' ),
 			)
 		);
 		self::notice( 'success', __( 'Settings saved.', 'marsad' ) );
 		self::back( 'settings' );
+	}
+
+	/**
+	 * role => ticked values for every role shown on the form, so a role with nothing ticked is
+	 * stored as "nothing" rather than falling back to the default. save_settings() validates.
+	 */
+	private static function posted_role_lists( $field ) {
+		// phpcs:disable WordPress.Security.NonceVerification.Missing -- verified in guard().
+		$shown  = array_map( 'sanitize_key', (array) wp_unslash( $_POST['roles_shown'] ?? array() ) );
+		$posted = (array) wp_unslash( $_POST[ $field ] ?? array() );
+		// phpcs:enable
+		$out = array();
+		foreach ( $shown as $role ) {
+			$out[ $role ] = array_map( 'sanitize_key', (array) ( $posted[ $role ] ?? array() ) );
+		}
+		return $out;
 	}
 
 	public static function handle_check_update() {

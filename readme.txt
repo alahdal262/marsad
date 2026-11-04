@@ -4,7 +4,7 @@ Tags: analytics, statistics, dashboard, google analytics, social media
 Requires at least: 6.5
 Tested up to: 6.8
 Requires PHP: 7.4
-Stable tag: 0.6.1
+Stable tag: 0.7.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -22,6 +22,8 @@ Sources:
 * YouTube: subscribers, views, videos
 * Facebook Page and Instagram: followers
 * Telegram: channel members
+* X (Twitter), Threads and TikTok: followers and activity
+* Live stream: viewers by platform, hours watched and peak viewers, from a small collector on the streaming server
 * Google Play: installs, uninstalls, active devices
 * App Store: downloads, re-downloads, updates, by country
 * Your own sources: add any JSON address with one button, as many as you need
@@ -45,6 +47,9 @@ Administrators by default. Choose more roles under Marsad → Settings.
 Hourly by default, through WP-Cron. Use "Sync now" on the dashboard to refresh immediately.
 
 == Changelog ==
+
+= 0.7.0 =
+* Live stream viewers by platform, choices per role (sections seen, platforms they may connect), X, Threads and TikTok.
 
 = 0.6.1 =
 * The total inside the channels donut is no longer cut off on right-to-left screens.

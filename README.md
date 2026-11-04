@@ -29,6 +29,10 @@ Later releases appear in **Dashboard → Updates** like any other plugin. To tur
 | YouTube | Subscribers, total views, videos; views of recent uploads | Paste the channel link. Any public channel works, no key needed (advanced: your own API key, or Connect with Google for your own channel) |
 | Facebook Page | Followers, fans, people talking about the page | Paste one token from Facebook's token tools, pick the Page; Marsad keeps the Page's never-expiring token |
 | Instagram | Followers, posts | Nothing more: found through the Facebook Page. Advanced: follow any public business/creator account by username |
+| X (Twitter) | Followers, posts, lists | Bearer token from a paid (Basic) X API plan |
+| Threads | Followers; views, likes, replies, reposts per day | A long-lived Threads token (renewed automatically) |
+| TikTok | Followers, likes, videos | Client key/secret and a refresh token (rotated automatically) |
+| Live stream | Viewers by platform, hours watched, peak viewers, watching now | The collector in `server/stream` on the streaming server, with the push key from the card |
 | Telegram | Channel or group members | Bot token (the bot must be in the channel) and `@channel` or chat ID |
 | Google Play | Daily installs, uninstalls, active devices, total users | **Connect with Google** with an account that can download Play reports, plus the package name and reports bucket |
 | App Store | Downloads, re-downloads, updates; downloads by country | App Store Connect API key (Issuer ID, Key ID, `.p8`) with Sales access, vendor number; optional Apple ID to filter one app |

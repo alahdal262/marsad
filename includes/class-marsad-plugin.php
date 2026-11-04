@@ -9,6 +9,10 @@ class Marsad_Plugin {
 
 	const CAP_VIEW   = 'marsad_view';
 	const CAP_MANAGE = 'marsad_manage';
+	/** Given to roles allowed to connect some sources; which ones is in settings role_connect. */
+	const CAP_CONNECT = 'marsad_connect';
+	/** Connect permissions that are not a single source. */
+	const CONNECT_EXTRA = array( 'google', 'custom' );
 	const CRON_HOOK  = 'marsad_sync';
 	const OPT_SETTINGS = 'marsad_settings';
 
@@ -34,7 +38,18 @@ class Marsad_Plugin {
 		Marsad_Store::maybe_upgrade();
 		add_filter( 'cron_schedules', array( __CLASS__, 'cron_schedules' ) );
 		add_action( 'before_delete_post', array( 'Marsad_Connector_Wordpress', 'on_delete' ), 10, 2 );
+		add_action( 'rest_api_init', array( 'Marsad_Connector_Stream', 'register_route' ) );
 		add_action( self::CRON_HOOK, array( 'Marsad_Sync', 'run_all' ) );
+		// Managers can always connect; no role change needed on existing sites.
+		add_filter(
+			'user_has_cap',
+			function ( $all ) {
+				if ( ! empty( $all[ self::CAP_MANAGE ] ) ) {
+					$all[ self::CAP_CONNECT ] = true;
+				}
+				return $all;
+			}
+		);
 		self::ensure_cron();
 
 		if ( is_admin() ) {
@@ -64,7 +79,60 @@ class Marsad_Plugin {
 			'interval'       => 'hourly',
 			'retention_days' => 730,
 			'backfill_days'  => 90,
+			// role => tabs it sees (absent: every tab), role => sources it may connect (absent: none).
+			'role_tabs'      => array(),
+			'role_connect'   => array(),
 		);
+	}
+
+	/**
+	 * Tabs the current user may open: every tab for managers and for roles nobody restricted,
+	 * otherwise the union of what their roles were given.
+	 *
+	 * @return string[] tab keys, in dashboard order
+	 */
+	public static function allowed_tabs() {
+		$all = array_keys( Marsad_Admin_Dashboard::tabs() );
+		if ( current_user_can( self::CAP_MANAGE ) ) {
+			return $all;
+		}
+		$map  = self::settings()['role_tabs'];
+		$tabs = array();
+		foreach ( (array) wp_get_current_user()->roles as $role ) {
+			if ( ! isset( $map[ $role ] ) ) {
+				return $all;
+			}
+			$tabs = array_merge( $tabs, (array) $map[ $role ] );
+		}
+		return array_values( array_intersect( $all, $tabs ) );
+	}
+
+	/** May the current user connect this source ('google' for the Google account, 'custom' for own sources)? */
+	public static function can_connect( $id ) {
+		if ( current_user_can( self::CAP_MANAGE ) ) {
+			return true;
+		}
+		if ( ! current_user_can( self::CAP_CONNECT ) ) {
+			return false;
+		}
+		$map = self::settings()['role_connect'];
+		foreach ( (array) wp_get_current_user()->roles as $role ) {
+			if ( in_array( (string) $id, (array) ( $map[ $role ] ?? array() ), true ) ) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	/** Source ids a role can be allowed to connect, plus the Google account and own sources. */
+	public static function connectable() {
+		$ids = array();
+		foreach ( Marsad_Registry::all() as $c ) {
+			if ( ! $c->always_on() && ! Marsad_Registry::is_custom( $c->id() ) ) {
+				$ids[] = $c->id();
+			}
+		}
+		return array_merge( self::CONNECT_EXTRA, $ids );
 	}
 
 	public static function settings() {
@@ -74,6 +142,18 @@ class Marsad_Plugin {
 
 	public static function save_settings( array $s ) {
 		$s = wp_parse_args( $s, self::defaults() );
+		// Only real tabs and sources survive, whatever was posted.
+		$tabs  = array_keys( Marsad_Admin_Dashboard::tabs() );
+		$conns = self::connectable();
+		foreach ( array( 'role_tabs' => $tabs, 'role_connect' => $conns ) as $key => $valid ) {
+			$clean = array();
+			foreach ( (array) $s[ $key ] as $role => $list ) {
+				if ( 'administrator' !== $role && isset( wp_roles()->roles[ $role ] ) ) {
+					$clean[ $role ] = array_values( array_intersect( array_map( 'strval', (array) $list ), $valid ) );
+				}
+			}
+			$s[ $key ] = $clean;
+		}
 		update_option( self::OPT_SETTINGS, $s, false );
 		self::apply_view_roles( $s['view_roles'] );
 		wp_clear_scheduled_hook( self::CRON_HOOK );
@@ -84,11 +164,17 @@ class Marsad_Plugin {
 	 * Grants marsad_view to exactly the chosen roles. Administrators always keep both caps.
 	 */
 	public static function apply_view_roles( array $roles ) {
+		$connect = self::settings()['role_connect'];
 		foreach ( wp_roles()->role_objects as $name => $role ) {
 			if ( 'administrator' === $name || in_array( $name, $roles, true ) ) {
 				$role->add_cap( self::CAP_VIEW );
 			} else {
 				$role->remove_cap( self::CAP_VIEW );
+			}
+			if ( 'administrator' !== $name && ! empty( $connect[ $name ] ) ) {
+				$role->add_cap( self::CAP_CONNECT );
+			} else {
+				$role->remove_cap( self::CAP_CONNECT );
 			}
 		}
 	}
