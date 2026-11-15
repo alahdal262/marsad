@@ -27,7 +27,7 @@ class Marsad_Admin_Settings {
 			echo '<input type="hidden" name="roles_shown[]" value="' . esc_attr( $key ) . '">';
 			if ( 'administrator' === $key ) {
 				echo '<p class="marsad-sub">' . esc_html__( 'Sees every section and may connect every platform.', 'marsad' ) . '</p>';
-				self::widget_choices( $key, $tabs, $home );
+				self::widget_choices( $key, Marsad_Admin_Dashboard::widget_sections(), $home );
 				echo '</fieldset>';
 				continue;
 			}
@@ -40,7 +40,7 @@ class Marsad_Admin_Settings {
 				echo '<label><input type="checkbox" name="role_tabs[' . esc_attr( $key ) . '][]" value="' . esc_attr( $t ) . '"' . checked( in_array( $t, $seen, true ), true, false ) . '> ' . esc_html( $label ) . '</label>';
 			}
 			echo '</div>';
-			self::widget_choices( $key, $tabs, $home );
+			self::widget_choices( $key, Marsad_Admin_Dashboard::widget_sections(), $home );
 			echo '<div><b>' . esc_html__( 'Platforms it may connect', 'marsad' ) . '</b>';
 			foreach ( Marsad_Plugin::connectable() as $id ) {
 				echo '<label><input type="checkbox" name="role_connect[' . esc_attr( $key ) . '][]" value="' . esc_attr( $id ) . '"' . checked( in_array( $id, $may, true ), true, false ) . '> ' . esc_html( $names[ $id ] ?? $id ) . '</label>';

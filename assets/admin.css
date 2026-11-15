@@ -377,3 +377,4 @@
 .marsad-widget .marsad-pcard { padding: 14px; }
 .marsad-widget-foot { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin: 12px 0 0; }
 .marsad-widget-foot a { font-weight: 600; text-decoration: none; }
+.marsad-widget-h { margin: 14px 0 6px; font-size: 13px; }

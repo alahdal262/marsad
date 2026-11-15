@@ -37,6 +37,27 @@ class Marsad_Admin_Dashboard {
 		);
 	}
 
+	/**
+	 * Boxes a role can get on the WordPress Dashboard: the sections, with Content & users
+	 * split in two. Each box needs the section it comes from (widget_tab()).
+	 */
+	public static function widget_sections() {
+		return array(
+			'overview'  => __( 'Overview', 'marsad' ),
+			'audience'  => __( 'Audience', 'marsad' ),
+			'content'   => __( 'Content', 'marsad' ),
+			'users'     => __( 'Users', 'marsad' ),
+			'search'    => __( 'Search', 'marsad' ),
+			'platforms' => __( 'Platforms & apps', 'marsad' ),
+			'hosting'   => __( 'Hosting', 'marsad' ),
+		);
+	}
+
+	/** The dashboard section a WordPress Dashboard box comes from. */
+	public static function widget_tab( $key ) {
+		return 'users' === $key ? 'content' : $key;
+	}
+
 	public static function render() {
 		if ( ! current_user_can( Marsad_Plugin::CAP_VIEW ) ) {
 			wp_die( esc_html__( 'You are not allowed to view statistics.', 'marsad' ), 403 );
@@ -116,7 +137,24 @@ class Marsad_Admin_Dashboard {
 		self::$snaps  = array();
 		$status       = Marsad_Sync::status();
 		echo '<div class="marsad marsad-widget">';
-		if ( 'overview' === $tab ) {
+		if ( 'users' === $tab ) {
+			$users   = self::metric( 'site', 'users' );
+			$roles   = self::$report->table( 'site', 'users_by_role', array( 'agg' => 'last', 'limit' => 20 ) );
+			$authors = self::$report->table( 'wordpress', 'posts_by_author', array( 'agg' => 'sum', 'limit' => 6 ) );
+			$list    = ( null !== ( $users['value'] ?? null ) || $roles || $authors ) ? array( true ) : array();
+			if ( null !== ( $users['value'] ?? null ) ) {
+				echo '<section class="marsad-cards marsad-cards-compact">';
+				self::stat( __( 'Users', 'marsad' ), Marsad_Admin::format( $users['value'] ), '', self::COLORS[0] );
+				echo '</section>';
+			}
+			if ( $roles ) {
+				self::stacked( array_map( function ( $r ) { return array( $r['dim'], $r['value'] ); }, $roles ) );
+			}
+			if ( $authors ) {
+				echo '<h4 class="marsad-widget-h">' . esc_html__( 'Most active authors', 'marsad' ) . '</h4>';
+				self::ranked( $authors, false, true );
+			}
+		} elseif ( 'overview' === $tab ) {
 			$list = self::headline( self::$report->headline( self::$report->sections() ) );
 			if ( $list ) {
 				echo '<section class="marsad-cards marsad-cards-compact" aria-label="' . esc_attr__( 'Key numbers', 'marsad' ) . '">';
@@ -146,7 +184,7 @@ class Marsad_Admin_Dashboard {
 			echo '<p class="marsad-sub">' . esc_html__( 'Nothing to show here yet: its sources are not connected or not synced.', 'marsad' ) . '</p>';
 		}
 		/* translators: %s: dashboard section name */
-		echo '<p class="marsad-widget-foot"><span class="marsad-sub">' . esc_html__( 'Last 28 days', 'marsad' ) . '</span>' . self::tab_link( $tab, sprintf( __( 'Open %s', 'marsad' ), self::tabs()[ $tab ] ) ) . '</p>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- tab_link escapes.
+		echo '<p class="marsad-widget-foot"><span class="marsad-sub">' . esc_html__( 'Last 28 days', 'marsad' ) . '</span>' . self::tab_link( self::widget_tab( $tab ), sprintf( __( 'Open %s', 'marsad' ), self::tabs()[ self::widget_tab( $tab ) ] ) ) . '</p>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- tab_link escapes.
 		echo '</div>';
 	}
 

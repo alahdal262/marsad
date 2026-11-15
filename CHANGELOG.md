@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.8.1
+
+- WordPress Dashboard: "Content & users" is two boxes a role can get separately — Content (posts) and Users (total, by role, most active authors). Both need the Content & users section.
+
 ## 0.8.0
 
 - New source: Cloudflare. Everything its analytics shows for the domain, day by day for up to a year: requests, page views, unique visitors, data served, share served from cache, encrypted share, threats stopped, client and server errors, and breakdowns by country (requests, data, threats), response code, content type, browser, visitor type (regular, search engines, monitoring…), threat kind, HTTP and TLS version. Shown in the Hosting tab and under Platforms. A subdomain site finds its main domain's zone by itself. Countries are named in the admin's language.

@@ -11,7 +11,7 @@ class Marsad_Admin_Widgets {
 
 	/** wp_dashboard_setup: one box per section the current user should get. */
 	public static function register() {
-		$tabs = Marsad_Admin_Dashboard::tabs();
+		$tabs = Marsad_Admin_Dashboard::widget_sections();
 		foreach ( Marsad_Plugin::dashboard_tabs() as $tab ) {
 			wp_add_dashboard_widget(
 				'marsad-' . $tab,

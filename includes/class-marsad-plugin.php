@@ -124,7 +124,14 @@ class Marsad_Plugin {
 		foreach ( (array) wp_get_current_user()->roles as $role ) {
 			$want = array_merge( $want, (array) ( $map[ $role ] ?? array( 'overview' ) ) );
 		}
-		return array_values( array_intersect( self::allowed_tabs(), $want ) );
+		$allowed = self::allowed_tabs();
+		$out     = array();
+		foreach ( array_keys( Marsad_Admin_Dashboard::widget_sections() ) as $key ) {
+			if ( in_array( $key, $want, true ) && in_array( Marsad_Admin_Dashboard::widget_tab( $key ), $allowed, true ) ) {
+				$out[] = $key;
+			}
+		}
+		return $out;
 	}
 
 	/** May the current user connect this source ('google' for the Google account, 'custom' for own sources)? */
@@ -165,7 +172,7 @@ class Marsad_Plugin {
 		// Only real tabs and sources survive, whatever was posted.
 		$tabs  = array_keys( Marsad_Admin_Dashboard::tabs() );
 		$conns = self::connectable();
-		foreach ( array( 'role_tabs' => $tabs, 'role_connect' => $conns, 'role_widgets' => $tabs ) as $key => $valid ) {
+		foreach ( array( 'role_tabs' => $tabs, 'role_connect' => $conns, 'role_widgets' => array_keys( Marsad_Admin_Dashboard::widget_sections() ) ) as $key => $valid ) {
 			$clean = array();
 			foreach ( (array) $s[ $key ] as $role => $list ) {
 				// Administrators see and connect everything, but choose their own Dashboard sections.
