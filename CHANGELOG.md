@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.8.0
+
+- New source: Cloudflare. Everything its analytics shows for the domain, day by day for up to a year: requests, page views, unique visitors, data served, share served from cache, encrypted share, threats stopped, client and server errors, and breakdowns by country (requests, data, threats), response code, content type, browser, visitor type (regular, search engines, monitoring…), threat kind, HTTP and TLS version. Shown in the Hosting tab and under Platforms. A subdomain site finds its main domain's zone by itself. Countries are named in the admin's language.
+
 ## 0.7.4
 
 - Marsad sections on the WordPress Dashboard (the home screen after login). In Settings each role card, administrators included, has "On the WordPress Dashboard": the ticked sections appear there as boxes with their key numbers for the last 28 days and a link to the full section. Users can hide or move them under Screen Options. A role nobody configured gets the overview; a section the role may not see never appears.

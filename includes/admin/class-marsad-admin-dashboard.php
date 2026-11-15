@@ -870,6 +870,13 @@ class Marsad_Admin_Dashboard {
 		}
 		echo '</b><span>' . esc_html__( 'Checked on every sync, and live when you open this page.', 'marsad' ) . '</span></div></div>';
 
+		// Edge traffic (Cloudflare): what reaches the domain before the hosting answers it.
+		foreach ( $report->sections() as $s ) {
+			if ( 'cloudflare' === $s['connector']->id() ) {
+				self::section( $s, $status );
+			}
+		}
+
 		echo '<div class="marsad-cols">';
 		// The headline is the latest measurement (today's counts); the bars are finished days.
 		$resp   = self::metric( 'site', 'response_ms' );
@@ -1231,6 +1238,7 @@ class Marsad_Admin_Dashboard {
 			'search_console' => 'search',
 			'wordpress'      => 'content',
 			'site'           => 'hosting',
+			'cloudflare'     => 'hosting',
 		);
 		return $tabs[ $id ] ?? 'platforms';
 	}

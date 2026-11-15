@@ -25,6 +25,7 @@ class Marsad_Registry {
 		return array(
 			'Marsad_Connector_Wordpress',
 			'Marsad_Connector_Site',
+			'Marsad_Connector_Cloudflare',
 			'Marsad_Connector_Ga4',
 			'Marsad_Connector_Search_Console',
 			'Marsad_Connector_Youtube',
